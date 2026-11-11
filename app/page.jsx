@@ -1,0 +1,359 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
+const categories = [
+  { name: "All shops", icon: "✳", slug: "all" },
+  { name: "Food & drinks", icon: "🥘", slug: "food" },
+  { name: "Fashion", icon: "👕", slug: "fashion" },
+  { name: "Accessories", icon: "💍", slug: "accessories" },
+  { name: "Gadgets", icon: "🎧", slug: "gadgets" },
+  { name: "Beauty", icon: "🧴", slug: "beauty" },
+];
+
+const shops = [
+  {
+    name: "Chop & Chill",
+    category: "Food & drinks",
+    slug: "food",
+    description: "Comfort food, made fresh",
+    keywords: "jollof rice meals",
+    image:
+      "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
+    rating: "4.9",
+    orders: 128,
+    delivery: "15–25 min",
+    badge: "Top seller",
+    initials: "C",
+    color: "#e9764d",
+  },
+  {
+    name: "The Daily Drip",
+    category: "Fashion",
+    slug: "fashion",
+    description: "Looks that do the talking",
+    keywords: "outfits clothes",
+    image:
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=85",
+    rating: "4.8",
+    orders: 96,
+    delivery: "Same day",
+    badge: "Trending",
+    initials: "D",
+    color: "#9b82c4",
+  },
+  {
+    name: "Pocket Friendly",
+    category: "Gadgets",
+    slug: "gadgets",
+    description: "Everyday tech, better prices",
+    keywords: "headphones earbuds chargers",
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85",
+    rating: "4.7",
+    orders: 74,
+    delivery: "20–30 min",
+    badge: "Fast delivery",
+    initials: "P",
+    color: "#7f9b87",
+  },
+  {
+    name: "Little Luxuries",
+    category: "Accessories",
+    slug: "accessories",
+    description: "The finishing touches",
+    keywords: "jewelry bags accessories",
+    image:
+      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85",
+    rating: "4.9",
+    orders: 61,
+    delivery: "Same day",
+    badge: "",
+    initials: "L",
+    color: "#d5a255",
+  },
+  {
+    name: "Blend & Bloom",
+    category: "Food & drinks",
+    slug: "food",
+    description: "Smoothies and feel-good bowls",
+    keywords: "smoothies juice fruit bowls",
+    image:
+      "https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=900&q=85",
+    rating: "4.8",
+    orders: 52,
+    delivery: "15–25 min",
+    badge: "Fresh picks",
+    initials: "B",
+    color: "#91a866",
+  },
+  {
+    name: "Glow Theory",
+    category: "Beauty",
+    slug: "beauty",
+    description: "Your everyday beauty edit",
+    keywords: "skincare makeup beauty",
+    image:
+      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=85",
+    rating: "4.6",
+    orders: 38,
+    delivery: "Same day",
+    badge: "",
+    initials: "G",
+    color: "#dc8b9b",
+  },
+];
+
+const bars = [
+  { name: "Chop & Chill", orders: 128, width: 100 },
+  { name: "The Daily Drip", orders: 96, width: 75 },
+  { name: "Pocket Friendly", orders: 74, width: 58 },
+  { name: "Little Luxuries", orders: 61, width: 48 },
+];
+
+function ArrowIcon({ diagonal = false }) {
+  return <span aria-hidden="true">{diagonal ? "↗" : "→"}</span>;
+}
+
+function ShopCard({ shop }) {
+  return (
+    <article className="shop-card">
+      <a className="shop-image-link" href="#delivery" aria-label={`View ${shop.name}`}>
+        <img className="shop-image" src={shop.image} alt="" />
+        {shop.badge && <span className="shop-badge">{shop.badge}</span>}
+        <span className="open-indicator"><i /> Open now</span>
+      </a>
+      <div className="shop-card-content">
+        <div className="shop-title-row">
+          <div>
+            <p className="shop-category">{shop.category}</p>
+            <h3>{shop.name}</h3>
+          </div>
+          <span className="rating"><span aria-hidden="true">★</span> {shop.rating}</span>
+        </div>
+        <p className="shop-description">{shop.description}</p>
+        <div className="shop-meta">
+          <span><span aria-hidden="true">◷</span> {shop.delivery}</span>
+          <span className="meta-divider" />
+          <span><span aria-hidden="true">↗</span> {shop.orders} orders today</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default function Home() {
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [search, setSearch] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const visibleShops = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return shops.filter((shop) => {
+      const matchesCategory =
+        activeCategory === "all" || shop.slug === activeCategory;
+      const matchesSearch =
+        !query ||
+        `${shop.name} ${shop.category} ${shop.description} ${shop.keywords}`
+          .toLowerCase()
+          .includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, search]);
+
+  function chooseCategory(slug) {
+    setActiveCategory(slug);
+    setMenuOpen(false);
+    document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  return (
+    <main>
+      <header className="site-header">
+        <div className="header-inner">
+          <a className="brand" href="#" aria-label="RSU Mart home">
+            <span className="brand-mark">r<span>.</span></span>
+            <span>rsu<span className="brand-light">mart</span></span>
+          </a>
+          <div className="location">
+            <span className="location-pin" aria-hidden="true">⌖</span>
+            <span><small>DELIVERING AROUND</small><strong>RSU campus</strong></span>
+            <span className="location-chevron" aria-hidden="true">⌄</span>
+          </div>
+          <div className="header-actions">
+            <a className="seller-link" href="/seller">
+              Open a shop <ArrowIcon diagonal />
+            </a>
+            <a className="account-link" href="/login">Sign in</a>
+          </div>
+        </div>
+      </header>
+
+      <section className="hero">
+        <div className="hero-copy">
+          <div className="eyebrow"><span className="eyebrow-dot" /> YOUR CAMPUS, ALL IN ONE PLACE</div>
+          <h1>Good finds.<br /><span>Close by.</span></h1>
+          <p className="hero-subtitle">
+            Your favourite campus spots, all together.<br className="desktop-break" />
+            Find your thing. Get it to your door.
+          </p>
+          <form className="search-bar" onSubmit={(event) => {
+            event.preventDefault();
+            document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" });
+          }}>
+            <span className="search-icon" aria-hidden="true">⌕</span>
+            <input
+              aria-label="Search shops, food, fashion and more"
+              placeholder="Craving something?"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            {search && <button className="clear-search" type="button" onClick={() => setSearch("")} aria-label="Clear search">×</button>}
+            <button className="search-submit" type="submit">Find it <ArrowIcon /></button>
+          </form>
+          <div className="search-hints">
+            <span>Try:</span>
+            {["jollof", "outfits", "headphones"].map((item) => (
+              <button key={item} onClick={() => setSearch(item)}>{item}</button>
+            ))}
+          </div>
+        </div>
+        <div className="hero-visual">
+          <img
+            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1100&q=85"
+            alt="A colourful market display of fresh food"
+          />
+          <div className="hero-image-wash" />
+          <div className="floating-note">
+            <span className="note-icon">✳</span>
+            <span><strong>Made for campus life</strong><small>All the good stuff, in one spot.</small></span>
+          </div>
+          <div className="delivery-stamp"><span>LOCAL<br />LOVE</span><i>✳</i></div>
+        </div>
+        <div className="hero-bottom">
+          <span>Good things are happening around you.</span>
+          <a href="#shops">EXPLORE THE MART <ArrowIcon /></a>
+        </div>
+      </section>
+
+      <section className="category-section" aria-label="Shop by category">
+        <div className="section-heading category-heading">
+          <div><p className="section-kicker">A LITTLE BIT OF EVERYTHING</p><h2>What are you in the mood for?</h2></div>
+          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}>
+            <span className="menu-lines"><i /><i /></span>
+            Browse categories
+          </button>
+        </div>
+        <div className="category-list">
+          {categories.map((category) => (
+            <button
+              className={`category-chip ${activeCategory === category.slug ? "selected" : ""}`}
+              key={category.slug}
+              onClick={() => chooseCategory(category.slug)}
+            >
+              <span className="category-icon">{category.icon}</span>
+              <span>{category.name}</span>
+              <ArrowIcon />
+            </button>
+          ))}
+        </div>
+        {menuOpen && (
+          <div className="category-menu">
+            <p>SHOP BY CATEGORY</p>
+            {categories.map((category) => (
+              <button key={category.slug} onClick={() => chooseCategory(category.slug)}>
+                <span>{category.icon}</span>{category.name}<ArrowIcon />
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="shops-section" id="shops">
+        <div className="section-heading shops-heading">
+          <div>
+            <p className="section-kicker">THE NEIGHBOURHOOD FAVOURITES</p>
+            <h2>{search ? "Here’s what we found." : activeCategory === "all" ? "The spots everyone's talking about." : `${categories.find((item) => item.slug === activeCategory)?.name} around you.`}</h2>
+          </div>
+          <span className="live-tag"><i /> OPEN RIGHT NOW</span>
+        </div>
+        {visibleShops.length > 0 ? (
+          <div className="shop-grid">
+            {visibleShops.map((shop) => <ShopCard key={shop.name} shop={shop} />)}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <span>⌕</span><h3>No shops found just yet.</h3>
+            <p>Try a different search or explore all the shops.</p>
+            <button onClick={() => { setSearch(""); setActiveCategory("all"); }}>See all shops <ArrowIcon /></button>
+          </div>
+        )}
+        {visibleShops.length > 0 && (
+          <div className="shops-footer">
+            <span>Showing {visibleShops.length} neighbourhood {visibleShops.length === 1 ? "favourite" : "favourites"}</span>
+            <button onClick={() => { setActiveCategory("all"); setSearch(""); }}>Explore all shops <ArrowIcon /></button>
+          </div>
+        )}
+      </section>
+
+      <section className="community-section" id="community">
+        <div className="community-copy">
+          <p className="section-kicker">THE CAMPUS PULSE</p>
+          <h2>Small businesses.<br /><span>Big main-character energy.</span></h2>
+          <p className="community-description">Every order keeps a local dream moving. Here’s who the campus is showing love to today.</p>
+          <div className="community-proof"><span className="proof-avatars"><i>C</i><i>D</i><i>P</i></span><span><strong>Your neighbours are here.</strong><small>Shop local. Make someone’s day.</small></span></div>
+        </div>
+        <div className="chart-card">
+          <div className="chart-heading">
+            <div><p>TODAY’S MOST LOVED</p><h3>Campus favourites</h3></div>
+            <span className="chart-period"><i /> TODAY</span>
+          </div>
+          <p className="chart-description">Ranked by orders today</p>
+          <div className="chart-bars">
+            {bars.map((bar, index) => (
+              <div className="chart-row" key={bar.name}>
+                <span className="chart-rank">0{index + 1}</span>
+                <span className="chart-name">{bar.name}</span>
+                <div className="chart-track"><span style={{ width: `${bar.width}%` }} /></div>
+                <strong className="chart-count">{bar.orders}</strong>
+              </div>
+            ))}
+          </div>
+          <div className="chart-footnote"><span>✳</span> Your next favourite is just around the corner.</div>
+        </div>
+      </section>
+
+      <section className="delivery-section" id="delivery">
+        <div className="delivery-art" aria-hidden="true">
+          <span className="delivery-circle"><span>↗</span></span>
+          <span className="delivery-spark spark-one">✳</span>
+          <span className="delivery-spark spark-two">✳</span>
+          <span className="delivery-path" />
+        </div>
+        <div className="delivery-copy">
+          <p className="section-kicker">YOUR ORDER, YOUR WAY</p>
+          <h2>From their hands<br />to <span>your plans.</span></h2>
+          <p>Choose delivery to your door or swing by to pick it up. Your local favourites are closer than you think.</p>
+          <div className="delivery-options">
+            <span><i>↗</i><strong>Doorstep drop-off</strong><small>Make it a little too easy.</small></span>
+            <span><i>⌖</i><strong>Quick pick-up</strong><small>Passing by? Grab and go.</small></span>
+          </div>
+        </div>
+      </section>
+
+      <section className="seller-banner">
+        <div className="banner-spark">✳</div>
+        <div><p className="section-kicker">GOT SOMETHING GOOD?</p><h2>Your shop deserves<br />a spot on campus.</h2><p>Bring your business to the neighbourhood. We’ll save you a seat.</p></div>
+        <a className="seller-banner-link" href="/seller">Become a seller <ArrowIcon diagonal /></a>
+        <span className="seller-fee">One-time seller onboarding <strong>₦5,000</strong></span>
+      </section>
+
+      <footer className="site-footer">
+        <a className="brand footer-brand" href="#"><span className="brand-mark">r<span>.</span></span><span>rsu<span className="brand-light">mart</span></span></a>
+        <span>Good finds, close by. Made with <b>♥</b> around RSU.</span>
+        <a href="#shops">Back to the good stuff ↑</a>
+      </footer>
+
+    </main>
+  );
+}
