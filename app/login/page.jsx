@@ -11,7 +11,7 @@ function safeNextPath(value) {
     value.startsWith("//") ||
     value.includes("\\")
   ) {
-    return "/seller";
+    return "/";
   }
   return value;
 }
