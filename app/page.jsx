@@ -271,6 +271,7 @@ export default function Home() {
             <span className="location-chevron" aria-hidden="true">⌄</span>
           </div>
           <div className="header-actions">
+            {viewer?.isAdmin && <a className="seller-link" href="/admin/transfers">Admin <ArrowIcon diagonal /></a>}
             <a className="seller-link" href={hasShop ? "/seller/products" : "/seller"}>
               {hasShop ? "My shop" : "Open a shop"} <ArrowIcon diagonal />
             </a>

@@ -18,6 +18,7 @@ export default function LoginForm({ nextPath }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [adminSetupToken, setAdminSetupToken] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -40,6 +41,7 @@ export default function LoginForm({ nextPath }) {
           email,
           password,
           ...(mode === "register" ? { name } : {}),
+          ...(mode === "register" && adminSetupToken ? { adminSetupToken } : {}),
         }),
       });
       const result = await response.json();
@@ -100,6 +102,15 @@ export default function LoginForm({ nextPath }) {
               <span>Email address</span>
               <input autoComplete="email" name="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required maxLength={254} />
             </label>
+            {mode === "register" && (
+              <details className="auth-admin-setup">
+                <summary>Site admin account setup</summary>
+                <label>
+                  <span>Private setup code <small>Only for the allowlisted site admin</small></span>
+                  <input autoComplete="off" name="adminSetupToken" type="password" value={adminSetupToken} onChange={(event) => setAdminSetupToken(event.target.value)} placeholder="Provided by the site owner" maxLength={256} />
+                </label>
+              </details>
+            )}
             <label>
               <span>Password</span>
               <input autoComplete={mode === "register" ? "new-password" : "current-password"} name="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder={mode === "register" ? "At least 10 characters" : "Your password"} required minLength={mode === "register" ? 10 : 1} maxLength={72} />

@@ -7,6 +7,8 @@ import {
   publicUser,
   SESSION_COOKIE,
   SESSION_DURATION_MS,
+  isAllowlistedAdminEmail,
+  verifyAdminSetupToken,
 } from "../../../../lib/auth";
 import {
   createDevelopmentUser,
@@ -22,6 +24,7 @@ const registrationSchema = z.object({
     (value) => Buffer.byteLength(value, "utf8") <= 72,
     "Password must be 72 bytes or fewer.",
   ),
+  adminSetupToken: z.string().max(256).optional(),
 });
 
 export async function POST(request) {
@@ -46,6 +49,10 @@ export async function POST(request) {
 
   const name = parsed.data.name;
   const email = parsed.data.email.toLowerCase();
+  const adminAccount = isAllowlistedAdminEmail(email);
+  if (adminAccount && !verifyAdminSetupToken(parsed.data.adminSetupToken)) {
+    return Response.json({ error: "Admin account setup requires the private setup code configured by the site owner." }, { status: 403 });
+  }
   if (!(await checkRateLimit("register", email, 5, 24 * 60 * 60 * 1000))) {
     return rateLimitedResponse(24 * 60 * 60);
   }
@@ -59,6 +66,7 @@ export async function POST(request) {
       email,
       passwordHash,
       sellerStatus: "none",
+      adminAccess: adminAccount,
       createdAt: new Date(),
     });
   } else {
@@ -69,9 +77,10 @@ export async function POST(request) {
         email,
         passwordHash,
         sellerStatus: "none",
+        adminAccess: adminAccount,
         createdAt: new Date(),
       });
-      user = { _id: result.insertedId, name, email, sellerStatus: "none" };
+      user = { _id: result.insertedId, name, email, sellerStatus: "none", adminAccess: adminAccount };
     } catch (error) {
       if (error?.code !== 11000) throw error;
     }

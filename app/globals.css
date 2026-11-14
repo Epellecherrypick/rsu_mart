@@ -539,6 +539,57 @@ a { color: inherit; text-decoration: none; }
 .profile-message { margin: 0; color: #63776a; font-size: 10px; }
 .profile-back { margin-top: 18px; color: #63776a; font-size: 10px; }
 
+.transfer-card { width: min(100% - 40px, 560px); padding: 32px; margin: auto; border: 1px solid #e9e8de; border-radius: 8px; background: white; box-shadow: 0 12px 38px rgba(32,52,44,.05); }
+.transfer-card h1, .admin-setup-card h1 { margin: 10px 0; font-family: Manrope, sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -1.4px; }
+.transfer-status-note { margin: 0 0 18px; color: #808981; font-size: 11px; line-height: 1.75; }
+.transfer-countdown { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px; border-radius: 5px; background: #f4f3ed; }
+.transfer-countdown span { color: #7f897f; font-size: 9px; font-weight: 700; letter-spacing: .8px; }
+.transfer-countdown strong { color: #405649; font-family: Manrope, sans-serif; font-size: 17px; font-variant-numeric: tabular-nums; }
+.transfer-details { display: grid; margin-top: 14px; border: 1px solid #eceae1; border-radius: 5px; }
+.transfer-details > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px; padding: 13px 14px; border-bottom: 1px solid #f0efe9; }
+.transfer-details > div:last-child { border-bottom: 0; }
+.transfer-details span { color: #8a928a; font-size: 9px; }
+.transfer-details strong { color: #405649; font-size: 12px; text-align: right; }
+.transfer-copy-row button { padding: 6px 9px; border: 1px solid #e5e7dc; border-radius: 4px; background: #fff; color: #536e5a; font-size: 9px; font-weight: 700; cursor: pointer; }
+.transfer-copy-row strong { grid-column: 1; grid-row: 2; font-family: ui-monospace, monospace; font-size: 13px; letter-spacing: .4px; text-align: left; }
+.transfer-copy-row button { grid-column: 2; grid-row: 1 / span 2; }
+.transfer-code-row { background: #fbfaf6; }
+.transfer-code-row strong { color: #283f32; font-size: 15px; letter-spacing: 1px; }
+.transfer-review-note { margin: 14px 0 18px; color: #8b938b; font-size: 9px; line-height: 1.65; }
+.transfer-card > .payment-button { width: 100%; margin-top: 17px; }
+.admin-transfer-wrap { width: min(100% - 40px, 920px); flex: 1; padding: 45px 0 55px; margin: 0 auto; }
+.admin-transfer-wrap > h1 { margin: 10px 0 7px; font-family: Manrope, sans-serif; font-size: 36px; font-weight: 600; letter-spacing: -1.7px; }
+.admin-transfer-intro { max-width: 650px; margin: 0 0 22px; color: #808981; font-size: 11px; line-height: 1.7; }
+.admin-transfer-toolbar { display: flex; gap: 9px; margin-bottom: 18px; }
+.admin-transfer-toolbar input { min-width: 0; height: 42px; flex: 1; padding: 0 12px; border: 1px solid #e8e8e0; border-radius: 4px; outline: 0; background: white; font-size: 11px; }
+.admin-transfer-toolbar input:focus { border-color: #9db19b; box-shadow: 0 0 0 3px rgba(118,145,118,.12); }
+.admin-transfer-toolbar button { padding: 0 15px; border: 1px solid #e4e6dc; border-radius: 4px; background: white; color: #536e5a; font-size: 10px; font-weight: 700; cursor: pointer; }
+.admin-transfer-list { display: grid; gap: 12px; }
+.admin-transfer-item { padding: 20px; border: 1px solid #e9e8de; border-radius: 7px; background: white; box-shadow: 0 7px 23px rgba(32,52,44,.035); }
+.admin-transfer-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #edede6; }
+.admin-transfer-item-heading .section-kicker { margin: 0 0 5px; color: #78877a; font-size: 8px; }
+.admin-transfer-item-heading h2 { margin: 0; font-family: ui-monospace, monospace; font-size: 16px; letter-spacing: .7px; }
+.admin-transfer-item-heading > strong { font-family: Manrope, sans-serif; font-size: 19px; }
+.admin-transfer-item dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin: 15px 0; }
+.admin-transfer-item dl > div { min-width: 0; }
+.admin-transfer-item dt { margin-bottom: 4px; color: #929a92; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+.admin-transfer-item dd { overflow-wrap: anywhere; margin: 0; color: #516158; font-size: 10px; line-height: 1.6; }
+.admin-transfer-actions { display: flex; gap: 8px; padding-top: 13px; border-top: 1px solid #edede6; }
+.admin-transfer-actions button { min-height: 37px; padding: 0 13px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+.admin-approve-button { border: 0; background: #405f4a; color: white; }
+.admin-reject-button { border: 1px solid #eee0da; background: white; color: #a35a47; }
+.admin-transfer-actions button:disabled { opacity: .6; cursor: wait; }
+.admin-transfer-empty { padding: 35px; border: 1px dashed #dddcd2; border-radius: 6px; color: #7c877d; text-align: center; }
+.admin-transfer-empty h2 { margin: 0 0 7px; color: #405649; font-size: 16px; }
+.admin-transfer-empty p { margin: 0; font-size: 10px; }
+.admin-transfer-notice { padding: 10px 12px; border: 1px solid #dce8d9; border-radius: 4px; background: #f2f7ef; color: #58745b; font-size: 10px; }
+.admin-setup-card { width: min(100% - 40px, 460px); padding: 30px; margin: auto; border: 1px solid #e9e8de; border-radius: 8px; background: white; box-shadow: 0 12px 38px rgba(32,52,44,.05); }
+.admin-setup-card > p:not(.section-kicker) { color: #808981; font-size: 11px; line-height: 1.7; }
+.auth-admin-setup { padding: 10px 12px; border: 1px solid #edede5; border-radius: 4px; }
+.auth-admin-setup summary { color: #728075; font-size: 9px; cursor: pointer; }
+.auth-admin-setup label { margin-top: 12px; }
+.auth-admin-setup label small { color: #989f97; font-weight: 400; }
+
 @media (max-width: 720px) {
   .auth-topbar, .seller-topbar { min-height: 64px; padding: 0 18px; }
   .auth-layout { width: min(100% - 36px, 460px); grid-template-columns: 1fr; gap: 20px; padding: 26px 0 32px; }
@@ -566,6 +617,13 @@ a { color: inherit; text-decoration: none; }
   .seller-topbar > div { gap: 13px; }
   .seller-topbar > div a, .seller-topbar > div button, .seller-topbar > a:last-child { font-size: 9px; }
   .payment-result-card { padding: 30px 22px; }
+  .transfer-card { padding: 24px 19px; }
+  .transfer-card h1, .admin-setup-card h1 { font-size: 26px; }
+  .admin-transfer-wrap { width: min(100% - 36px, 560px); padding: 35px 0; }
+  .admin-transfer-wrap > h1 { font-size: 29px; }
+  .admin-transfer-item { padding: 15px; }
+  .admin-transfer-item dl { grid-template-columns: 1fr; gap: 10px; }
+  .admin-setup-card { padding: 24px 20px; }
   .shop-setup-wrap { width: min(100% - 36px, 560px); padding: 34px 0; }
   .shop-setup-layout { grid-template-columns: 1fr; gap: 16px; }
   .shop-setup-form, .shop-preview { padding: 19px; }

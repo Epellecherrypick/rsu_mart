@@ -37,7 +37,7 @@ export default function SellerDashboard({ user }) {
         return;
       }
 
-      window.location.assign(result.authorizationUrl);
+      router.push(`/seller/payment/verify?reference=${encodeURIComponent(result.payment.reference)}`);
     } catch {
       setError("We couldn’t reach the payment provider. Please try again.");
     } finally {
@@ -80,7 +80,7 @@ export default function SellerDashboard({ user }) {
     <main className="seller-page">
       <header className="seller-topbar">
         <Brand />
-        <div><a href="/">← Back to the mart</a><button onClick={signOut}>Sign out</button></div>
+        <div>{user.isAdmin && <a href="/admin/transfers">Admin transfers</a>}<a href="/">← Back to the mart</a><button onClick={signOut}>Sign out</button></div>
       </header>
       <section className="seller-dashboard">
         <div className="seller-welcome">
@@ -96,8 +96,8 @@ export default function SellerDashboard({ user }) {
             <p>{isTestSeller
               ? "Free development test access is enabled. No payment was made; this account is for testing seller features."
               : isPaid
-                ? "Your ₦5,000 onboarding payment has been verified. Your account is ready for shop setup."
-              : "Pay securely through OPay to unlock seller onboarding. You’ll be redirected to OPay’s hosted checkout; RSU Mart never sees or stores your card details."}</p>
+                ? "Your ₦5,000 seller onboarding transfer has been approved. Your account is ready for shop setup."
+              : "Transfer ₦5,000 from any Nigerian bank app to the RSU Mart account. Your unique transfer code helps us match it; seller access opens after admin approval."}</p>
             {!isPaid && (
               <div className="seller-payment-summary">
                 <span>Seller onboarding <small>One-time payment</small></span>
@@ -114,9 +114,9 @@ export default function SellerDashboard({ user }) {
             ) : (
               <>
                 <button className="payment-button" onClick={beginPayment} disabled={busy}>
-                  {busy ? "Connecting to OPay…" : <>Continue to secure payment <span aria-hidden="true">↗</span></>}
+                  {busy ? "Preparing transfer details…" : <>Get transfer instructions <span aria-hidden="true">→</span></>}
                 </button>
-                <small className="seller-secure-note"><span>🔒</span> Secure checkout by OPay · NGN · ₦5,000</small>
+                <small className="seller-secure-note"><span>◷</span> One-time ₦5,000 transfer · code valid for 2 hours</small>
                 {canUseFreeDevActivation && (
                   <button
                     className="seller-dev-activate"
@@ -132,8 +132,8 @@ export default function SellerDashboard({ user }) {
           </div>
           <div className="seller-checklist">
             <p>WHAT HAPPENS NEXT</p>
-            <span className={isPaid ? "done" : ""}><i>{isPaid ? "✓" : "01"}</i> {isTestSeller ? "Free development test access" : "Secure onboarding payment"}</span>
-            <span><i>02</i> Set up your shop & categories</span>
+            <span className={isPaid ? "done" : ""}><i>{isPaid ? "✓" : "01"}</i> {isTestSeller ? "Free development test access" : "Bank transfer + admin approval"}</span>
+            <span><i>{isPaid ? "✓" : "02"}</i> Set up your shop & categories</span>
             <span><i>03</i> Add products and opening hours</span>
             <span><i>04</i> Start receiving orders</span>
           </div>
