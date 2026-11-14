@@ -8,6 +8,10 @@ import {
   SESSION_DURATION_MS,
   verifyPassword,
 } from "../../../../lib/auth";
+import {
+  findDevelopmentUserByEmail,
+  isDevelopmentAuthEnabled,
+} from "../../../../lib/dev-auth";
 import { getDatabase } from "../../../../lib/mongodb";
 import { checkRateLimit, rateLimitedResponse } from "../../../../lib/rate-limit";
 
@@ -41,8 +45,13 @@ export async function POST(request) {
     return rateLimitedResponse();
   }
 
-  const database = await getDatabase();
-  const user = await database.collection("users").findOne({ email });
+  let user;
+  if (isDevelopmentAuthEnabled()) {
+    user = findDevelopmentUserByEmail(email);
+  } else {
+    const database = await getDatabase();
+    user = await database.collection("users").findOne({ email });
+  }
   const passwordMatches = await verifyPassword(
     parsed.data.password,
     user?.passwordHash,

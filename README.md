@@ -15,6 +15,13 @@ Next.js, React, and MongoDB.
 7. Start the development server with `npm run dev`.
 8. Open [http://localhost:3000](http://localhost:3000).
 
+While `next dev` is running, registration and sign-in use temporary
+development-only accounts held in memory, so you can explore authenticated
+screens without connecting MongoDB. These accounts and sessions are lost when
+the server restarts. Production always requires MongoDB; the temporary mode
+cannot be enabled there. Payment and other database-backed features still
+require MongoDB.
+
 Never commit `.env.local` or live payment credentials. Use Paystack test keys
 for local development. In the Paystack dashboard, configure the webhook URL as
 `https://<your-domain>/api/webhooks/paystack`. The app verifies webhook

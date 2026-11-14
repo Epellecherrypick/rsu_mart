@@ -8,6 +8,10 @@ import {
   SESSION_COOKIE,
   SESSION_DURATION_MS,
 } from "../../../../lib/auth";
+import {
+  createDevelopmentUser,
+  isDevelopmentAuthEnabled,
+} from "../../../../lib/dev-auth";
 import { getDatabase } from "../../../../lib/mongodb";
 import { checkRateLimit, rateLimitedResponse } from "../../../../lib/rate-limit";
 
@@ -46,27 +50,38 @@ export async function POST(request) {
     return rateLimitedResponse(24 * 60 * 60);
   }
 
-  const database = await getDatabase();
   const passwordHash = await hashPassword(parsed.data.password);
   let user;
 
-  try {
-    const result = await database.collection("users").insertOne({
+  if (isDevelopmentAuthEnabled()) {
+    user = createDevelopmentUser({
       name,
       email,
       passwordHash,
       sellerStatus: "none",
       createdAt: new Date(),
     });
-    user = { _id: result.insertedId, name, email, sellerStatus: "none" };
-  } catch (error) {
-    if (error?.code === 11000) {
-      return Response.json(
-        { error: "An account with this email already exists. Sign in instead." },
-        { status: 409 },
-      );
+  } else {
+    const database = await getDatabase();
+    try {
+      const result = await database.collection("users").insertOne({
+        name,
+        email,
+        passwordHash,
+        sellerStatus: "none",
+        createdAt: new Date(),
+      });
+      user = { _id: result.insertedId, name, email, sellerStatus: "none" };
+    } catch (error) {
+      if (error?.code !== 11000) throw error;
     }
-    throw error;
+  }
+
+  if (!user) {
+    return Response.json(
+      { error: "An account with this email already exists. Sign in instead." },
+      { status: 409 },
+    );
   }
 
   const session = await createSession(user._id);
