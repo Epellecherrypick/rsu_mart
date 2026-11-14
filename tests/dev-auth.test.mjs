@@ -5,13 +5,18 @@ import {
   activateDevelopmentSeller,
   checkDevelopmentRateLimit,
   createDevelopmentShopForSeller,
+  createDevelopmentProduct,
   createDevelopmentSession,
   createDevelopmentUser,
+  deleteDevelopmentProduct,
   deleteDevelopmentSession,
   findDevelopmentUserByEmail,
+  getDevelopmentProductForSeller,
   getDevelopmentUserForSession,
   getDevelopmentShopForSeller,
+  listDevelopmentProductsForShop,
   listDevelopmentShops,
+  updateDevelopmentProduct,
   updateDevelopmentShopForSeller,
 } from "../lib/dev-auth.js";
 
@@ -45,6 +50,17 @@ test("temporary accounts and sessions work only in development", () => {
       updateDevelopmentShopForSeller(user._id, { name: "Updated Shop" }).name,
       "Updated Shop",
     );
+    const product = createDevelopmentProduct({
+      shopId: shop._id,
+      ownerId: user._id,
+      name: "Test product",
+      isActive: true,
+    });
+    assert.equal(listDevelopmentProductsForShop(shop._id).length, 1);
+    assert.equal(getDevelopmentProductForSeller(product._id, user._id), product);
+    assert.equal(updateDevelopmentProduct(product._id, user._id, { name: "Updated product" }).name, "Updated product");
+    assert.equal(deleteDevelopmentProduct(product._id, user._id), true);
+    assert.equal(getDevelopmentProductForSeller(product._id, user._id), null);
 
     const expiresAt = new Date(Date.now() + 60_000);
     createDevelopmentSession(sessionHash, user._id, expiresAt);

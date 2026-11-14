@@ -145,12 +145,12 @@ function ShopCard({ shop }) {
 
   return (
     <article className="shop-card">
-      <div className="shop-image-link">
+      <a className="shop-image-link" href={shop.id ? `/shops/${encodeURIComponent(shop.id)}` : "#shops"} aria-label={`View ${shop.name}`}>
         <img className="shop-image" src={shop.image} alt={`${shop.name} shop banner`} />
         {shop.badge && <span className="shop-badge">{shop.badge}</span>}
         <span className="open-indicator"><i /> Open now</span>
         {brandStrip && <span className="shop-theme-accent" style={{ background: brandStrip }} aria-hidden="true" />}
-      </div>
+      </a>
       <div className="shop-card-content">
         <div className="shop-title-row">
           <div>
@@ -178,6 +178,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [preferredCategories, setPreferredCategories] = useState([]);
+  const [hasShop, setHasShop] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -209,6 +210,14 @@ export default function Home() {
         if (!active || !result?.user) return;
         setViewer(result.user);
         setPreferredCategories((result.user.preferences?.categories || []).map(categorySlug));
+        if (result.user.sellerStatus === "paid") {
+          fetch("/api/seller/shop", { cache: "no-store", credentials: "same-origin" })
+            .then((response) => response.ok ? response.json() : null)
+            .then((shopResult) => {
+              if (active && shopResult?.shop) setHasShop(true);
+            })
+            .catch(() => {});
+        }
       })
       .catch(() => {});
     const params = new URLSearchParams(window.location.search);
@@ -262,8 +271,8 @@ export default function Home() {
             <span className="location-chevron" aria-hidden="true">⌄</span>
           </div>
           <div className="header-actions">
-            <a className="seller-link" href="/seller">
-              Open a shop <ArrowIcon diagonal />
+            <a className="seller-link" href={hasShop ? "/seller/products" : "/seller"}>
+              {hasShop ? "My shop" : "Open a shop"} <ArrowIcon diagonal />
             </a>
             <a className="account-link" href={viewer ? "/profile" : "/login"}>{viewer ? viewer.name.split(" ")[0] : "Sign in"}</a>
           </div>

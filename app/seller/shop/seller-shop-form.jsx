@@ -197,7 +197,12 @@ export default function SellerShopForm() {
               {busy ? "Saving…" : exists ? "Save shop changes" : "Create my shop"}
               {!busy && <span aria-hidden="true">→</span>}
             </button>
-            {exists && <p className="shop-one-only-note">You can edit your shop, but each seller can have only one.</p>}
+            {exists && (
+              <>
+                <p className="shop-one-only-note">You can edit your shop, but each seller can have only one.</p>
+                <a className="products-manage-link" href="/seller/products">Manage your products →</a>
+              </>
+            )}
           </form>
 
           <aside className="shop-preview" aria-label="Live shop preview">
