@@ -37,31 +37,31 @@ export default function SellerDashboard({ user }) {
         return;
       }
 
-      async function activateTestSeller() {
-        setBusy(true);
-        setError("");
-        try {
-          const response = await fetch("/api/seller/dev-activate", {
-            method: "POST",
-            credentials: "same-origin",
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            setError(result.error || "Could not activate the test seller account.");
-            return;
-          }
-
-          router.refresh();
-        } catch {
-          setError("We couldn’t activate the test seller account. Please try again.");
-        } finally {
-          setBusy(false);
-        }
-      }
-
       window.location.assign(result.authorizationUrl);
     } catch {
       setError("We couldn’t reach the payment provider. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function activateTestSeller() {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch("/api/seller/dev-activate", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        setError(result.error || "Could not activate the test seller account.");
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      setError("We couldn’t activate the test seller account. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -106,7 +106,11 @@ export default function SellerDashboard({ user }) {
             )}
             {error && <p className="seller-payment-error" role="alert">{error}</p>}
             {isPaid ? (
-              <div className="seller-next-step"><span>✓</span> Payment complete — shop setup is the next step.</div>
+              <div className="seller-next-step">
+                <span>✓</span>
+                {isTestSeller ? "Test seller access is active." : "Seller access is active."}
+                <a href="/seller/shop">Set up / manage your shop →</a>
+              </div>
             ) : (
               <>
                 <button className="payment-button" onClick={beginPayment} disabled={busy}>

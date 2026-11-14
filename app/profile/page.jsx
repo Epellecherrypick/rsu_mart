@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const categories = ["Food & drinks", "Fashion", "Accessories", "Gadgets", "Beauty"];
+const categories = ["Food & drinks", "Fashion", "Accessories", "Gadgets", "Beauty", "Other services"];
 
 export default function ProfilePage() {
   const router = useRouter();

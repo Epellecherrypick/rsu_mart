@@ -7,7 +7,7 @@ import { isDevelopmentAuthEnabled, updateDevelopmentUser } from "../../../../lib
 const profileSchema = z.object({
   name: z.string().trim().min(2).max(80),
   preferences: z.object({
-    categories: z.array(z.enum(["Food & drinks", "Fashion", "Accessories", "Gadgets", "Beauty"])).max(5),
+    categories: z.array(z.enum(["Food & drinks", "Fashion", "Accessories", "Gadgets", "Beauty", "Other services"])).max(6),
     campusLocation: z.string().trim().min(2).max(80),
   }),
 });

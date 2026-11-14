@@ -90,19 +90,20 @@ through OPay hosted checkout. Payment details never pass through RSU Mart.
 Successful status requires a server-to-server OPay verification with the
 expected reference, amount, and currency. The same confirmation logic handles
 the signed transaction-status webhook and the checkout return page. A successful
-payment unlocks seller access; shop setup, seller approval workflows, and
-refunds still need to be built.
+payment unlocks seller access. Sellers can create one shop; seller approval
+workflows and refunds still need to be built.
 
 Production deployment must use HTTPS and a production `NEXT_PUBLIC_SITE_URL`.
 Keep OPay keys server-only; never prefix them with `NEXT_PUBLIC_`.
 
 ## Marketplace data
 
-The storefront currently uses sample businesses for its visual preview. The
-`GET /api/shops` endpoint reads open businesses from the `shops` collection and
-orders them by daily orders. Documents should include `name`, `category`, and
-`isOpen`; optional display fields include `description`, `image`, `rating`,
-`dailyOrders`, and `deliveryEstimate`.
+The storefront includes sample businesses and reads open shops from the
+`shops` collection. Sellers with active seller access can create and edit one
+shop at `/seller/shop`, choose a service category, add a banner image URL, and
+customize colors, gradients, and font. Shop details are stored in MongoDB;
+local development shops are held in memory. Banner images currently use public
+HTTPS URLs; direct uploads and product listings are not part of this step.
 
 Checkout for customer orders, inventory management, and live delivery booking
 are not implemented yet.

@@ -9,6 +9,7 @@ const categories = [
   { name: "Accessories", icon: "💍", slug: "accessories" },
   { name: "Gadgets", icon: "🎧", slug: "gadgets" },
   { name: "Beauty", icon: "🧴", slug: "beauty" },
+  { name: "Other services", icon: "✦", slug: "other-services" },
 ];
 
 function categorySlug(value) {
@@ -123,18 +124,38 @@ function ArrowIcon({ diagonal = false }) {
 }
 
 function ShopCard({ shop }) {
+  const accentColor = /^#[\da-f]{6}$/i.test(shop.theme?.accentColor || "")
+    ? shop.theme.accentColor
+    : undefined;
+  const gradientStart = /^#[\da-f]{6}$/i.test(shop.theme?.gradientStart || "")
+    ? shop.theme.gradientStart
+    : accentColor;
+  const gradientEnd = /^#[\da-f]{6}$/i.test(shop.theme?.gradientEnd || "")
+    ? shop.theme.gradientEnd
+    : accentColor;
+  const brandStrip = shop.theme?.mode === "gradient" && gradientStart && gradientEnd
+    ? `linear-gradient(90deg, ${gradientStart}, ${gradientEnd})`
+    : accentColor;
+  const fontFamily = {
+    sans: "Arial, sans-serif",
+    serif: "Georgia, serif",
+    rounded: "Trebuchet MS, sans-serif",
+    mono: "Courier New, monospace",
+  }[shop.theme?.font];
+
   return (
     <article className="shop-card">
-      <a className="shop-image-link" href="#delivery" aria-label={`View ${shop.name}`}>
-        <img className="shop-image" src={shop.image} alt="" />
+      <div className="shop-image-link">
+        <img className="shop-image" src={shop.image} alt={`${shop.name} shop banner`} />
         {shop.badge && <span className="shop-badge">{shop.badge}</span>}
         <span className="open-indicator"><i /> Open now</span>
-      </a>
+        {brandStrip && <span className="shop-theme-accent" style={{ background: brandStrip }} aria-hidden="true" />}
+      </div>
       <div className="shop-card-content">
         <div className="shop-title-row">
           <div>
-            <p className="shop-category">{shop.category}</p>
-            <h3>{shop.name}</h3>
+            <p className="shop-category" style={accentColor ? { color: accentColor } : undefined}>{shop.category}</p>
+            <h3 style={fontFamily ? { fontFamily } : undefined}>{shop.name}</h3>
           </div>
           <span className="rating"><span aria-hidden="true">★</span> {shop.rating}</span>
         </div>
@@ -151,6 +172,7 @@ function ShopCard({ shop }) {
 
 export default function Home() {
   const [shopData, setShopData] = useState(shops);
+  const [shopsLoading, setShopsLoading] = useState(true);
   const [viewer, setViewer] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
@@ -163,17 +185,24 @@ export default function Home() {
       .then(async (response) => {
         if (!response.ok) return;
         const result = await response.json();
-        if (active && Array.isArray(result)) setShopData(result.map((shop) => ({
-          ...shop,
-          slug: categorySlug(shop.category),
-          rating: shop.rating || "New",
-          orders: shop.dailyOrders || 0,
-          delivery: shop.deliveryEstimate || "Ask the shop",
-          badge: "",
-          image: shop.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
-          keywords: shop.keywords || "",
-        })));
-      }).catch(() => {});
+        if (active && Array.isArray(result)) {
+          const listedShops = result.map((shop) => ({
+            ...shop,
+            slug: categorySlug(shop.category),
+            rating: shop.rating || "New",
+            orders: shop.dailyOrders || 0,
+            delivery: shop.deliveryEstimate || "Ask the shop",
+            badge: "",
+            image: shop.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
+            keywords: shop.keywords || "",
+          }));
+          setShopData(listedShops.length
+            ? (process.env.NODE_ENV === "development" ? [...listedShops, ...shops] : listedShops)
+            : shops);
+        }
+      }).catch(() => {}).finally(() => {
+        if (active) setShopsLoading(false);
+      });
     fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" })
       .then((response) => response.ok ? response.json() : null)
       .then((result) => {
@@ -217,7 +246,6 @@ export default function Home() {
     if (slug === "all") params.delete("category"); else params.set("category", slug);
     const query = params.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
-    document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
@@ -303,6 +331,7 @@ export default function Home() {
               className={`category-chip ${activeCategory === category.slug ? "selected" : ""}`}
               key={category.slug}
               onClick={() => chooseCategory(category.slug)}
+              aria-pressed={activeCategory === category.slug}
             >
               <span className="category-icon">{category.icon}</span>
               <span>{category.name}</span>
@@ -314,7 +343,7 @@ export default function Home() {
           <div className="category-menu">
             <p>SHOP BY CATEGORY</p>
             {categories.map((category) => (
-              <button key={category.slug} onClick={() => chooseCategory(category.slug)}>
+              <button key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}>
                 <span>{category.icon}</span>{category.name}<ArrowIcon />
               </button>
             ))}
@@ -330,7 +359,11 @@ export default function Home() {
           </div>
           <span className="live-tag"><i /> OPEN RIGHT NOW</span>
         </div>
-        {visibleShops.length > 0 ? (
+        {shopsLoading ? (
+          <div className="shop-grid shop-grid-loading" aria-label="Loading shops" aria-busy="true">
+            {Array.from({ length: 3 }, (_, index) => <div className="shop-card shop-skeleton" key={index}><span /><div><i /><i /><i /></div></div>)}
+          </div>
+        ) : visibleShops.length > 0 ? (
           <div className="shop-grid">
             {visibleShops.map((shop) => <ShopCard key={shop.id || shop.name} shop={shop} />)}
           </div>

@@ -4,11 +4,15 @@ import test from "node:test";
 import {
   activateDevelopmentSeller,
   checkDevelopmentRateLimit,
+  createDevelopmentShopForSeller,
   createDevelopmentSession,
   createDevelopmentUser,
   deleteDevelopmentSession,
   findDevelopmentUserByEmail,
   getDevelopmentUserForSession,
+  getDevelopmentShopForSeller,
+  listDevelopmentShops,
+  updateDevelopmentShopForSeller,
 } from "../lib/dev-auth.js";
 
 test("temporary accounts and sessions work only in development", () => {
@@ -32,6 +36,15 @@ test("temporary accounts and sessions work only in development", () => {
     assert.equal(activateDevelopmentSeller(user._id), user);
     assert.equal(user.sellerStatus, "paid");
     assert.ok(user.sellerPaidAt instanceof Date);
+
+    const shop = createDevelopmentShopForSeller(user._id, { name: "Test Shop" });
+    assert.equal(getDevelopmentShopForSeller(user._id), shop);
+    assert.ok(listDevelopmentShops().includes(shop));
+    assert.equal(createDevelopmentShopForSeller(user._id, { name: "Second Shop" }), null);
+    assert.equal(
+      updateDevelopmentShopForSeller(user._id, { name: "Updated Shop" }).name,
+      "Updated Shop",
+    );
 
     const expiresAt = new Date(Date.now() + 60_000);
     createDevelopmentSession(sessionHash, user._id, expiresAt);
@@ -61,6 +74,14 @@ test("temporary account storage refuses non-development environments", () => {
     );
     assert.throws(
       () => activateDevelopmentSeller("unused"),
+      /only available in development/,
+    );
+    assert.throws(
+      () => getDevelopmentShopForSeller("unused"),
+      /only available in development/,
+    );
+    assert.throws(
+      () => listDevelopmentShops(),
       /only available in development/,
     );
   } finally {
