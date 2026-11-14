@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
 import {
+  activateDevelopmentSeller,
   checkDevelopmentRateLimit,
   createDevelopmentSession,
   createDevelopmentUser,
@@ -28,6 +29,9 @@ test("temporary accounts and sessions work only in development", () => {
     assert.ok(user._id);
     assert.equal(findDevelopmentUserByEmail(email), user);
     assert.equal(createDevelopmentUser({ email }), null);
+    assert.equal(activateDevelopmentSeller(user._id), user);
+    assert.equal(user.sellerStatus, "paid");
+    assert.ok(user.sellerPaidAt instanceof Date);
 
     const expiresAt = new Date(Date.now() + 60_000);
     createDevelopmentSession(sessionHash, user._id, expiresAt);
@@ -53,6 +57,10 @@ test("temporary account storage refuses non-development environments", () => {
     process.env.NODE_ENV = "production";
     assert.throws(
       () => findDevelopmentUserByEmail("unused@example.com"),
+      /only available in development/,
+    );
+    assert.throws(
+      () => activateDevelopmentSeller("unused"),
       /only available in development/,
     );
   } finally {

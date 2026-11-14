@@ -1,5 +1,5 @@
 import { getUserFromRequest } from "../../../../lib/auth";
-import { confirmSellerPayment } from "../../../../lib/paystack";
+import { confirmSellerPayment } from "../../../../lib/opay";
 import { checkRateLimit, rateLimitedResponse } from "../../../../lib/rate-limit";
 
 export async function GET(request) {

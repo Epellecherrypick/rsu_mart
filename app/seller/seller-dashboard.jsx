@@ -17,6 +17,8 @@ export default function SellerDashboard({ user }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const isPaid = user.sellerStatus === "paid";
+  const isTestSeller = user.sellerTestMode === true;
+  const canUseFreeDevActivation = process.env.NODE_ENV === "development";
 
   async function beginPayment() {
     setBusy(true);
@@ -33,6 +35,28 @@ export default function SellerDashboard({ user }) {
       if (!response.ok) {
         setError(result.error || "We couldn’t start the payment. Please try again.");
         return;
+      }
+
+      async function activateTestSeller() {
+        setBusy(true);
+        setError("");
+        try {
+          const response = await fetch("/api/seller/dev-activate", {
+            method: "POST",
+            credentials: "same-origin",
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            setError(result.error || "Could not activate the test seller account.");
+            return;
+          }
+
+          router.refresh();
+        } catch {
+          setError("We couldn’t activate the test seller account. Please try again.");
+        } finally {
+          setBusy(false);
+        }
       }
 
       window.location.assign(result.authorizationUrl);
@@ -67,11 +91,13 @@ export default function SellerDashboard({ user }) {
         <div className="seller-step-card">
           <div className={`seller-step-icon ${isPaid ? "complete" : ""}`}>{isPaid ? "✓" : "01"}</div>
           <div className="seller-step-content">
-            <p className="section-kicker">{isPaid ? "PAYMENT CONFIRMED" : "ONE-TIME SELLER ONBOARDING"}</p>
+            <p className="section-kicker">{isTestSeller ? "TEST SELLER ACTIVE" : isPaid ? "PAYMENT CONFIRMED" : "ONE-TIME SELLER ONBOARDING"}</p>
             <h2>{isPaid ? "Your seller access is active." : "A little setup. A lot of possibilities."}</h2>
-            <p>{isPaid
-              ? "Your ₦5,000 onboarding payment has been verified. Your account is ready for shop setup."
-              : "Pay securely through Paystack to unlock seller onboarding. You’ll be redirected to Paystack’s hosted checkout; RSU Mart never sees or stores your card details."}</p>
+            <p>{isTestSeller
+              ? "Free development test access is enabled. No payment was made; this account is for testing seller features."
+              : isPaid
+                ? "Your ₦5,000 onboarding payment has been verified. Your account is ready for shop setup."
+              : "Pay securely through OPay to unlock seller onboarding. You’ll be redirected to OPay’s hosted checkout; RSU Mart never sees or stores your card details."}</p>
             {!isPaid && (
               <div className="seller-payment-summary">
                 <span>Seller onboarding <small>One-time payment</small></span>
@@ -83,16 +109,26 @@ export default function SellerDashboard({ user }) {
               <div className="seller-next-step"><span>✓</span> Payment complete — shop setup is the next step.</div>
             ) : (
               <>
-                <button className="paystack-button" onClick={beginPayment} disabled={busy}>
-                  {busy ? "Connecting to Paystack…" : <>Continue to secure payment <span aria-hidden="true">↗</span></>}
+                <button className="payment-button" onClick={beginPayment} disabled={busy}>
+                  {busy ? "Connecting to OPay…" : <>Continue to secure payment <span aria-hidden="true">↗</span></>}
                 </button>
-                <small className="seller-secure-note"><span>🔒</span> Secure checkout by Paystack · NGN · ₦5,000</small>
+                <small className="seller-secure-note"><span>🔒</span> Secure checkout by OPay · NGN · ₦5,000</small>
+                {canUseFreeDevActivation && (
+                  <button
+                    className="seller-dev-activate"
+                    type="button"
+                    onClick={activateTestSeller}
+                    disabled={busy}
+                  >
+                    {busy ? "Activating test seller…" : "Activate free test seller (development only)"}
+                  </button>
+                )}
               </>
             )}
           </div>
           <div className="seller-checklist">
             <p>WHAT HAPPENS NEXT</p>
-            <span className={isPaid ? "done" : ""}><i>{isPaid ? "✓" : "01"}</i> Secure onboarding payment</span>
+            <span className={isPaid ? "done" : ""}><i>{isPaid ? "✓" : "01"}</i> {isTestSeller ? "Free development test access" : "Secure onboarding payment"}</span>
             <span><i>02</i> Set up your shop & categories</span>
             <span><i>03</i> Add products and opening hours</span>
             <span><i>04</i> Start receiving orders</span>

@@ -63,14 +63,14 @@ export default function PaymentVerificationPage() {
         <p>{status === "paid"
           ? "Your ₦5,000 seller onboarding payment is confirmed. Your seller access is ready."
           : status === "checking"
-            ? "We’re checking the transaction directly with Paystack. Please don’t close this page."
+            ? "We’re checking the transaction directly with OPay. Please don’t close this page."
             : message}</p>
         {status === "paid" ? (
-          <button className="paystack-button" onClick={() => router.replace("/seller")}>Continue to seller onboarding <span aria-hidden="true">→</span></button>
+          <button className="payment-button" onClick={() => router.replace("/seller")}>Continue to seller onboarding <span aria-hidden="true">→</span></button>
         ) : status === "error" ? (
-          <button className="paystack-button" onClick={() => router.replace("/seller")}>Return to seller onboarding <span aria-hidden="true">→</span></button>
+          <button className="payment-button" onClick={() => router.replace("/seller")}>Return to seller onboarding <span aria-hidden="true">→</span></button>
         ) : (
-          <span className="payment-security-note"><i /> Your card details are handled by Paystack.</span>
+          <span className="payment-security-note"><i /> Your payment details are handled by OPay.</span>
         )}
       </section>
       <footer className="auth-footer"><span>© RSU Mart</span><span>Good finds. Close by.</span><a href="/">Explore the mart</a></footer>
