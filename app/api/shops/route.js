@@ -11,6 +11,7 @@ export async function GET() {
           projection: {
             name: 1,
             category: 1,
+            keywords: 1,
             description: 1,
             image: 1,
             rating: 1,
@@ -25,7 +26,21 @@ export async function GET() {
       .toArray();
 
     return Response.json(
-      shops.map(({ _id, ...shop }) => ({ id: _id.toString(), ...shop })),
+      shops.map(({ _id, ...shop }) => ({
+        id: _id.toString(),
+        ...shop,
+        slug: ({
+          "food & drinks": "food",
+          fashion: "fashion",
+          accessories: "accessories",
+          gadgets: "gadgets",
+          beauty: "beauty",
+        }[String(shop.category || "").trim().toLowerCase()] || String(shop.category || "other")
+          .toLowerCase()
+          .replace(/&/g, "and")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")),
+      })),
     );
   } catch (error) {
     console.error("Failed to load shops:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const categories = [
   { name: "All shops", icon: "✳", slug: "all" },
@@ -10,6 +10,13 @@ const categories = [
   { name: "Gadgets", icon: "🎧", slug: "gadgets" },
   { name: "Beauty", icon: "🧴", slug: "beauty" },
 ];
+
+function categorySlug(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  const known = categories.find((category) => category.name.toLowerCase() === normalized);
+  if (known) return known.slug;
+  return normalized.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "other";
+}
 
 const shops = [
   {
@@ -143,13 +150,47 @@ function ShopCard({ shop }) {
 }
 
 export default function Home() {
+  const [shopData, setShopData] = useState(shops);
+  const [viewer, setViewer] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [preferredCategories, setPreferredCategories] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/shops", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const result = await response.json();
+        if (active && Array.isArray(result)) setShopData(result.map((shop) => ({
+          ...shop,
+          slug: categorySlug(shop.category),
+          rating: shop.rating || "New",
+          orders: shop.dailyOrders || 0,
+          delivery: shop.deliveryEstimate || "Ask the shop",
+          badge: "",
+          image: shop.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=85",
+          keywords: shop.keywords || "",
+        })));
+      }).catch(() => {});
+    fetch("/api/auth/me", { cache: "no-store", credentials: "same-origin" })
+      .then((response) => response.ok ? response.json() : null)
+      .then((result) => {
+        if (!active || !result?.user) return;
+        setViewer(result.user);
+        setPreferredCategories((result.user.preferences?.categories || []).map(categorySlug));
+      })
+      .catch(() => {});
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("category");
+    if (category && (category === "all" || categories.some((item) => item.slug === category))) setActiveCategory(category);
+    return () => { active = false; };
+  }, []);
 
   const visibleShops = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return shops.filter((shop) => {
+    const filtered = shopData.filter((shop) => {
       const matchesCategory =
         activeCategory === "all" || shop.slug === activeCategory;
       const matchesSearch =
@@ -159,11 +200,23 @@ export default function Home() {
           .includes(query);
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, search]);
+    if (activeCategory === "all" && !query && preferredCategories.length) {
+      return [...filtered].sort((a, b) => {
+        const aRank = preferredCategories.indexOf(a.slug);
+        const bRank = preferredCategories.indexOf(b.slug);
+        return (aRank < 0 ? Infinity : aRank) - (bRank < 0 ? Infinity : bRank);
+      });
+    }
+    return filtered;
+  }, [activeCategory, search, shopData, preferredCategories]);
 
   function chooseCategory(slug) {
     setActiveCategory(slug);
     setMenuOpen(false);
+    const params = new URLSearchParams(window.location.search);
+    if (slug === "all") params.delete("category"); else params.set("category", slug);
+    const query = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
     document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -177,14 +230,14 @@ export default function Home() {
           </a>
           <div className="location">
             <span className="location-pin" aria-hidden="true">⌖</span>
-            <span><small>DELIVERING AROUND</small><strong>RSU campus</strong></span>
+            <span><small>DELIVERING AROUND</small><strong>{viewer?.preferences?.campusLocation || "RSU campus"}</strong></span>
             <span className="location-chevron" aria-hidden="true">⌄</span>
           </div>
           <div className="header-actions">
             <a className="seller-link" href="/seller">
               Open a shop <ArrowIcon diagonal />
             </a>
-            <a className="account-link" href="/login">Sign in</a>
+            <a className="account-link" href={viewer ? "/profile" : "/login"}>{viewer ? viewer.name.split(" ")[0] : "Sign in"}</a>
           </div>
         </div>
       </header>
@@ -279,7 +332,7 @@ export default function Home() {
         </div>
         {visibleShops.length > 0 ? (
           <div className="shop-grid">
-            {visibleShops.map((shop) => <ShopCard key={shop.name} shop={shop} />)}
+            {visibleShops.map((shop) => <ShopCard key={shop.id || shop.name} shop={shop} />)}
           </div>
         ) : (
           <div className="empty-state">
