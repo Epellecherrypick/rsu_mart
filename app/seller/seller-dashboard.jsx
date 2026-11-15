@@ -16,11 +16,24 @@ export default function SellerDashboard({ user }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [senderAccountName, setSenderAccountName] = useState("");
+  const [senderAccountNumber, setSenderAccountNumber] = useState("");
   const isPaid = user.sellerStatus === "paid";
   const isTestSeller = user.sellerTestMode === true;
   const canUseFreeDevActivation = process.env.NODE_ENV === "development";
 
   async function beginPayment() {
+    const accountName = senderAccountName.trim();
+    const accountNumber = senderAccountNumber.trim();
+    if (accountName.length < 2 || accountName.length > 80) {
+      setError("Enter the account name you’ll transfer from.");
+      return;
+    }
+    if (!/^\d{10}$/.test(accountNumber)) {
+      setError("Enter the 10-digit account number you’ll transfer from.");
+      return;
+    }
+
     setBusy(true);
     setError("");
     try {
@@ -28,7 +41,7 @@ export default function SellerDashboard({ user }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: "{}",
+        body: JSON.stringify({ senderAccountName: accountName, senderAccountNumber: accountNumber }),
       });
       let result;
       try {
@@ -106,10 +119,18 @@ export default function SellerDashboard({ user }) {
                 ? "Your ₦5,000 seller onboarding transfer has been approved. Your account is ready for shop setup."
               : "Transfer ₦5,000 from any Nigerian bank app to the RSU Mart account. Your unique transfer code helps us match it; seller access opens after admin approval."}</p>
             {!isPaid && (
-              <div className="seller-payment-summary">
-                <span>Seller onboarding <small>One-time payment</small></span>
-                <strong>₦5,000</strong>
-              </div>
+              <>
+                <div className="seller-payment-summary">
+                  <span>Seller onboarding <small>One-time payment</small></span>
+                  <strong>₦5,000</strong>
+                </div>
+                <div className="seller-transfer-sender">
+                  <p>Transfer from</p>
+                  <label>Account name<input autoComplete="name" value={senderAccountName} onChange={(event) => setSenderAccountName(event.target.value)} maxLength={80} required /></label>
+                  <label>Account number<input inputMode="numeric" autoComplete="off" value={senderAccountNumber} onChange={(event) => setSenderAccountNumber(event.target.value.replace(/\D/g, "").slice(0, 10))} maxLength={10} minLength={10} required /></label>
+                  <small>We share these details and your RSU Mart profile only with admins to match your transfer.</small>
+                </div>
+              </>
             )}
             {error && <p className="seller-payment-error" role="alert">{error}</p>}
             {isPaid ? (
@@ -151,4 +172,5 @@ export default function SellerDashboard({ user }) {
     </main>
   );
 }
+
 

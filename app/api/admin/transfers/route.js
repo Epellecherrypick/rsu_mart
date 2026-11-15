@@ -31,11 +31,20 @@ function serializeAdminPayment(payment, customer) {
     currency: payment.currency,
     status: payment.status,
     transferDetails: payment.transferDetails,
+    senderDetails: payment.senderDetails || null,
     createdAt: payment.createdAt,
     expiresAt: payment.expiresAt,
     approvedAt: payment.approvedAt || null,
     approvedByEmail: payment.approvedByEmail || null,
-    customer: customer ? { name: customer.name, email: customer.email } : null,
+    customer: customer ? {
+      id: customer._id?.toString() || null,
+      name: customer.name,
+      email: customer.email,
+      profile: {
+        campusLocation: customer.preferences?.campusLocation || "RSU campus",
+        categories: Array.isArray(customer.preferences?.categories) ? customer.preferences.categories : [],
+      },
+    } : null,
   };
 }
 
@@ -74,7 +83,7 @@ export async function GET(request) {
         .toArray();
       const userIds = [...new Map(records.map((record) => [record.userId.toString(), record.userId])).values()];
       const customers = await database.collection("users")
-        .find({ _id: { $in: userIds } }, { projection: { name: 1, email: 1 } })
+        .find({ _id: { $in: userIds } }, { projection: { name: 1, email: 1, preferences: 1 } })
         .toArray();
       const customersById = new Map(customers.map((customer) => [customer._id.toString(), customer]));
       payments = records.map((payment) => serializeAdminPayment(
@@ -153,3 +162,4 @@ export async function PATCH(request) {
     return Response.json({ error: "Could not update this transfer right now." }, { status: 503 });
   }
 }
+

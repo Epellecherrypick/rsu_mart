@@ -29,7 +29,7 @@ export default function AdminTransferQueue() {
 
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return payments.filter((payment) => !query || `${payment.reference} ${payment.customer?.name || ""} ${payment.customer?.email || ""}`.toLowerCase().includes(query));
+    return payments.filter((payment) => !query || `${payment.reference} ${payment.customer?.name || ""} ${payment.customer?.email || ""} ${payment.senderDetails?.accountName || ""} ${payment.senderDetails?.accountNumber || ""}`.toLowerCase().includes(query));
   }, [payments, search]);
 
   async function review(payment, action) {
@@ -71,6 +71,8 @@ export default function AdminTransferQueue() {
           <dl>
             <div><dt>Seller</dt><dd>{payment.customer?.name || "Unknown account"}</dd></div>
             <div><dt>Email</dt><dd>{payment.customer?.email || "No email"}</dd></div>
+            <div><dt>Transfer from</dt><dd>{payment.senderDetails ? `${payment.senderDetails.accountName} · ${payment.senderDetails.accountNumber}` : "Not provided for this request"}</dd></div>
+            <div><dt>Website profile</dt><dd>{payment.customer ? `${payment.customer.profile?.campusLocation || "RSU campus"} · Interested in: ${payment.customer.profile?.categories?.length ? payment.customer.profile.categories.join(", ") : "No categories selected"}` : "Profile unavailable"}</dd></div>
             <div><dt>Transfer to</dt><dd>{payment.transferDetails?.bankName} · {payment.transferDetails?.accountName} · {payment.transferDetails?.accountNumber}</dd></div>
             <div><dt>Started</dt><dd>{new Date(payment.createdAt).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}</dd></div>
             <div><dt>Code expires</dt><dd>{new Date(payment.expiresAt).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}</dd></div>
@@ -85,3 +87,4 @@ export default function AdminTransferQueue() {
     <footer className="auth-footer"><span>© RSU Mart</span><span>Admin tools</span><a href="/seller">Seller dashboard</a></footer>
   </main>;
 }
+
