@@ -8,14 +8,19 @@ import {
   createDevelopmentProduct,
   createDevelopmentSession,
   createDevelopmentUser,
+  consumeDevelopmentPasswordReset,
   deleteDevelopmentProduct,
   deleteDevelopmentSession,
+  deleteDevelopmentSessionsForUser,
   findDevelopmentUserByEmail,
+  getDevelopmentPasswordReset,
   getDevelopmentProductForSeller,
   getDevelopmentUserForSession,
   getDevelopmentShopForSeller,
+  incrementDevelopmentPasswordResetAttempts,
   listDevelopmentProductsForShop,
   listDevelopmentShops,
+  setDevelopmentPasswordReset,
   updateDevelopmentProduct,
   updateDevelopmentShopForSeller,
 } from "../lib/dev-auth.js";
@@ -100,6 +105,46 @@ test("temporary account storage refuses non-development environments", () => {
       () => listDevelopmentShops(),
       /only available in development/,
     );
+  } finally {
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+  }
+});
+
+test("development password-reset codes expire, limit attempts, and are one-time", () => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const email = `${randomUUID()}@example.com`;
+  const otherEmail = `${randomUUID()}@example.com`;
+  const sessionHash = randomUUID();
+  const otherSessionHash = randomUUID();
+
+  try {
+    process.env.NODE_ENV = "development";
+    const user = createDevelopmentUser({ email, passwordHash: "old-hash" });
+    const otherUser = createDevelopmentUser({ email: otherEmail, passwordHash: "other-hash" });
+    const expiresAt = new Date(Date.now() + 60_000);
+    const reset = { userId: user._id, codeHash: "hashed-code", attempts: 0, expiresAt };
+
+    createDevelopmentSession(sessionHash, user._id, expiresAt);
+    createDevelopmentSession(otherSessionHash, otherUser._id, expiresAt);
+    setDevelopmentPasswordReset(email, reset);
+    assert.equal(getDevelopmentPasswordReset(email), reset);
+    assert.equal(incrementDevelopmentPasswordResetAttempts(email, 2).attempts, 1);
+    assert.equal(incrementDevelopmentPasswordResetAttempts(email, 2).attempts, 2);
+    assert.equal(incrementDevelopmentPasswordResetAttempts(email, 2), null);
+    assert.equal(consumeDevelopmentPasswordReset(email, "wrong-hash"), null);
+    assert.equal(consumeDevelopmentPasswordReset(email, "hashed-code"), reset);
+    assert.equal(consumeDevelopmentPasswordReset(email, "hashed-code"), null);
+
+    setDevelopmentPasswordReset(email, {
+      ...reset,
+      expiresAt: new Date(Date.now() - 1),
+    });
+    assert.equal(getDevelopmentPasswordReset(email), null);
+
+    deleteDevelopmentSessionsForUser(user._id);
+    assert.equal(getDevelopmentUserForSession(sessionHash), null);
+    assert.equal(getDevelopmentUserForSession(otherSessionHash), otherUser);
   } finally {
     if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
     else process.env.NODE_ENV = previousNodeEnv;

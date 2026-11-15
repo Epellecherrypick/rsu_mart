@@ -13,10 +13,14 @@ Next.js, React, and MongoDB.
    `SELLER_TRANSFER_ACCOUNT_NUMBER` to the receiving account details.
 6. Set `ADMIN_EMAILS` to your admin sign-in email and configure a private,
    random `ADMIN_SETUP_TOKEN`. Do not share or commit the setup token.
-7. Set `NEXT_PUBLIC_SITE_URL` to the origin serving the app (locally,
+7. Set `PASSWORD_RESET_EMAIL` to `null17868@gmail.com` and
+   `PASSWORD_RESET_EMAIL_APP_PASSWORD` to a Google App Password for that
+   account. Enable 2-Step Verification and create an App Password in Google
+   Account settings; do not use or share the account's normal password.
+8. Set `NEXT_PUBLIC_SITE_URL` to the origin serving the app (locally,
    `http://localhost:3000`).
-8. Start the development server with `npm run dev`.
-9. Open [http://localhost:3000](http://localhost:3000).
+9. Start the development server with `npm run dev`.
+10. Open [http://localhost:3000](http://localhost:3000).
 
 While `next dev` is running, registration and sign-in use temporary
 development-only accounts held in memory, so you can explore authenticated
@@ -59,6 +63,11 @@ optional.
    - `ADMIN_SETUP_TOKEN` — a long random secret used once to activate admin
      access. Set the same secret in your local environment and Vercel; never
      put it in browser code or commit it.
+   - `PASSWORD_RESET_EMAIL` — `null17868@gmail.com`, the Gmail address used to
+     send password reset codes.
+   - `PASSWORD_RESET_EMAIL_APP_PASSWORD` — a Google App Password for that
+     account. Enable 2-Step Verification and create an App Password in Google
+     Account settings; never use the account's normal password.
 5. In Atlas **Network Access**, configure access for your Vercel deployment.
    Vercel may use dynamic outbound IPs; if your plan has no static egress, Atlas
    may require `0.0.0.0/0`. If so, protect the database with a strong,
@@ -75,9 +84,14 @@ optional.
 Changing Vercel environment variables does not update an existing deployment;
 redeploy after changing them.
 
+Password reset codes are valid for 10 minutes and allow up to five attempts.
+Configure both email variables before using `/forgot-password`; set them in
+`.env.local` to test email delivery locally.
+
 ## Accounts and seller payments
 
-Users can register and sign in at `/login`. Passwords are bcrypt-hashed;
+Users can register and sign in at `/login` and recover passwords at
+`/forgot-password`. Passwords are bcrypt-hashed;
 sessions are random, revocable, stored as hashes in MongoDB, and sent in
 HttpOnly, SameSite cookies. Authentication and seller-payment endpoints check
 the request origin and apply database-backed rate limits.

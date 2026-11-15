@@ -122,6 +122,7 @@ export default function LoginForm({ nextPath }) {
               {!busy && <span aria-hidden="true">→</span>}
             </button>
           </form>
+          {mode === "login" && <a className="auth-forgot-link" href="/forgot-password">Forgot your password?</a>}
           <p className="auth-note"><span>🔒</span> Your details stay safe. We never store your payment card details.</p>
         </section>
       </div>
