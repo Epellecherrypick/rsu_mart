@@ -30,7 +30,12 @@ export default function SellerDashboard({ user }) {
         credentials: "same-origin",
         body: "{}",
       });
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error("RSU Mart returned an unexpected response. Please try again shortly.");
+      }
 
       if (!response.ok) {
         setError(result.error || "We couldn’t start the payment. Please try again.");
@@ -38,8 +43,10 @@ export default function SellerDashboard({ user }) {
       }
 
       router.push(`/seller/payment/verify?reference=${encodeURIComponent(result.payment.reference)}`);
-    } catch {
-      setError("We couldn’t reach the payment provider. Please try again.");
+    } catch (requestError) {
+      setError(requestError instanceof TypeError
+        ? "We couldn’t connect to RSU Mart. No bank transfer was started. Please try again shortly."
+        : requestError.message || "We couldn’t prepare your transfer details. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -144,3 +151,4 @@ export default function SellerDashboard({ user }) {
     </main>
   );
 }
+
