@@ -258,7 +258,7 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main className={`mart-theme ${activeCategory !== "all" ? `theme-${activeCategory}` : ""}`}>
       <header className="site-header">
         <div className="header-inner">
           <a className="brand" href="#" aria-label="RSU Mart home">
@@ -287,10 +287,10 @@ export default function Home() {
           <p>Pick a lane. Find your people. Get the good stuff close by.</p>
         </div>
         <div className="category-doors">
-          <button className="category-door door-food" onClick={() => chooseCategory("food")}><span className="door-index">01 / FRESH & LOCAL</span><span className="door-icon">🥘</span><strong>Food & drinks</strong><span className="door-description">Comfort food, cold drinks, little treats.</span><span className="door-link">Explore food <ArrowIcon /></span></button>
-          <button className="category-door door-fashion" onClick={() => chooseCategory("fashion")}><span className="door-index">02 / YOUR NEXT LOOK</span><span className="door-icon">✦</span><strong>Clothing</strong><span className="door-description">Fits with a little more main character.</span><span className="door-link">Find your fit <ArrowIcon /></span></button>
-          <button className="category-door door-gadgets" onClick={() => chooseCategory("gadgets")}><span className="door-index">03 / GEAR UP</span><span className="door-icon">⌘</span><strong>Gadgets</strong><span className="door-description">Smart tech for campus and everywhere.</span><span className="door-link">Explore tech <ArrowIcon /></span></button>
-          <button className="category-door door-accessories" onClick={() => chooseCategory("accessories")}><span className="door-index">04 / THE FINAL TOUCH</span><span className="door-icon">✧</span><strong>Accessories</strong><span className="door-description">Small details. Unmistakable energy.</span><span className="door-link">Find your extra <ArrowIcon /></span></button>
+          <button className={`category-door door-food ${activeCategory === "food" ? "active" : ""}`} aria-pressed={activeCategory === "food"} onClick={() => chooseCategory("food")}><span className="door-index">01 / FRESH & LOCAL</span><span className="door-icon">🥘</span><strong>Food & drinks</strong><span className="door-description">Comfort food, cold drinks, little treats.</span><span className="door-link">Explore food <ArrowIcon /></span></button>
+          <button className={`category-door door-fashion ${activeCategory === "fashion" ? "active" : ""}`} aria-pressed={activeCategory === "fashion"} onClick={() => chooseCategory("fashion")}><span className="door-index">02 / YOUR NEXT LOOK</span><span className="door-icon">✦</span><strong>Clothing</strong><span className="door-description">Fits with a little more main character.</span><span className="door-link">Find your fit <ArrowIcon /></span></button>
+          <button className={`category-door door-gadgets ${activeCategory === "gadgets" ? "active" : ""}`} aria-pressed={activeCategory === "gadgets"} onClick={() => chooseCategory("gadgets")}><span className="door-index">03 / GEAR UP</span><span className="door-icon">⌘</span><strong>Gadgets</strong><span className="door-description">Smart tech for campus and everywhere.</span><span className="door-link">Explore tech <ArrowIcon /></span></button>
+          <button className={`category-door door-accessories ${activeCategory === "accessories" ? "active" : ""}`} aria-pressed={activeCategory === "accessories"} onClick={() => chooseCategory("accessories")}><span className="door-index">04 / THE FINAL TOUCH</span><span className="door-icon">✧</span><strong>Accessories</strong><span className="door-description">Small details. Unmistakable energy.</span><span className="door-link">Find your extra <ArrowIcon /></span></button>
         </div>
         <form className="search-bar category-search" onSubmit={(event) => { event.preventDefault(); document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" }); }}>
           <span className="search-icon" aria-hidden="true">⌕</span>

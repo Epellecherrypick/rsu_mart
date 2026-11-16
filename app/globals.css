@@ -742,3 +742,94 @@ a { color: inherit; text-decoration: none; }
   .category-door { min-height: 210px; padding: 12px; }
   .door-description { font-size: 8px; }
 }
+
+.category-door.active { outline: 2px solid var(--door-accent); outline-offset: 3px; }
+.category-door:focus-visible { outline: 3px solid var(--door-accent); outline-offset: 4px; }
+.mart-theme { min-height: 100vh; background: var(--theme-page, #fbfaf6); color: var(--theme-ink, #20342c); transition: background-color .35s ease, color .35s ease; }
+.theme-food { --theme-page: #fffaf5; --theme-ink: #392c23; --orange: #e8794f; }
+.theme-food .site-header, .theme-food .category-experience, .theme-food .legacy-category-section, .theme-food .shops-section { background: #fffaf5; }
+.theme-fashion { --theme-page: #111210; --theme-ink: #f4f1df; --orange: #f6d444; --line: #34352d; }
+.theme-fashion .site-header { border-color: #34352d; background: #111210; }
+.theme-fashion .brand, .theme-fashion .seller-link, .theme-fashion .location strong { color: #f4f1df; }
+.theme-fashion .brand-light, .theme-fashion .location small { color: #aaa99d; }
+.theme-fashion .brand-mark { background: #f6d444; color: #171817; }
+.theme-fashion .account-link { border-color: #45453b; color: #e7e4d7; }
+.theme-fashion .category-experience, .theme-fashion .legacy-category-section, .theme-fashion .shops-section { background: #111210; }
+.theme-fashion .category-experience-heading h1, .theme-fashion .section-heading h2, .theme-fashion .shops-heading h2 { color: #f4f1df; }
+.theme-fashion .category-experience-heading h1 span, .theme-fashion .section-kicker, .theme-fashion .eyebrow { color: #f6d444; }
+.theme-fashion .category-experience-heading > p, .theme-fashion .category-experience-footer, .theme-fashion .shops-footer { color: #aaa99d; }
+.theme-fashion .category-experience-footer a, .theme-fashion .shops-footer button { color: #f6d444; }
+.theme-fashion .category-door:not(.door-fashion) { border-color: #34352d; background: #1b1c19; color: #f4f1df; }
+.theme-fashion .category-door:not(.door-fashion) .door-description { color: #aaa99d; }
+.theme-fashion .category-section { border-color: #34352d; }
+.theme-fashion .menu-toggle, .theme-fashion .category-chip { border-color: #3c3d34; background: #1b1c19; color: #e2dfd2; }
+.theme-fashion .category-chip.selected { border-color: #f6d444; background: #302c18; color: #f6d444; }
+.theme-fashion .category-icon { background: #302c18; }
+.theme-fashion .category-menu { border-color: #34352d; background: #1b1c19; }
+.theme-fashion .category-menu button { border-color: #34352d; background: #1b1c19; color: #f4f1df; }
+.theme-fashion .shop-card { border-color: #34352d; background: #1b1c19; }
+.theme-fashion .shop-title-row h3, .theme-fashion .shop-meta, .theme-fashion .empty-state h3 { color: #f4f1df; }
+.theme-fashion .shop-description, .theme-fashion .shop-meta, .theme-fashion .empty-state p { color: #aaa99d; }
+.theme-fashion .shop-meta { border-color: #34352d; }
+.theme-fashion .live-tag { border-color: #3c3d34; color: #c9c5b5; }
+.theme-fashion .community-section { background: #1a1b18; }
+.theme-fashion .community-copy h2, .theme-fashion .chart-heading h3 { color: #f4f1df; }
+.theme-fashion .community-description, .theme-fashion .community-proof small { color: #aaa99d; }
+.theme-fashion .chart-card { border-color: #34352d; background: #111210; }
+.theme-fashion .chart-name { color: #d3d0c2; }
+.theme-fashion .delivery-art { background: #22231f; }
+.theme-fashion .delivery-copy h2 { color: #f4f1df; }
+.theme-fashion .delivery-copy > p:not(.section-kicker), .theme-fashion .delivery-options small { color: #aaa99d; }
+.theme-fashion .seller-banner { background: #080908; }
+.theme-fashion .site-footer { color: #aaa99d; }
+.theme-gadgets { --theme-page: #07141c; --theme-ink: #e7f7fa; --orange: #55d8ed; --line: #183441; }
+.theme-gadgets .site-header { border-color: #183441; background: #07141c; }
+.theme-gadgets .brand, .theme-gadgets .seller-link, .theme-gadgets .location strong { color: #e7f7fa; }
+.theme-gadgets .brand-light, .theme-gadgets .location small { color: #8aabb6; }
+.theme-gadgets .brand-mark { background: #55d8ed; color: #07141c; }
+.theme-gadgets .account-link { border-color: #245064; color: #caeaf0; }
+.theme-gadgets .category-experience, .theme-gadgets .legacy-category-section, .theme-gadgets .shops-section { background: #07141c; }
+.theme-gadgets .category-experience-heading h1, .theme-gadgets .section-heading h2, .theme-gadgets .shops-heading h2 { color: #e7f7fa; }
+.theme-gadgets .category-experience-heading h1 span, .theme-gadgets .section-kicker, .theme-gadgets .eyebrow { color: #55d8ed; }
+.theme-gadgets .category-experience-heading > p, .theme-gadgets .category-experience-footer, .theme-gadgets .shops-footer { color: #8aabb6; }
+.theme-gadgets .category-experience-footer a, .theme-gadgets .shops-footer button { color: #55d8ed; }
+.theme-gadgets .category-door:not(.door-gadgets) { border-color: #183441; background: #0d202a; color: #e7f7fa; }
+.theme-gadgets .category-door:not(.door-gadgets) .door-description { color: #9cb8c0; }
+.theme-gadgets .category-section { border-color: #183441; }
+.theme-gadgets .menu-toggle, .theme-gadgets .category-chip { border-color: #245064; background: #0d202a; color: #caeaf0; }
+.theme-gadgets .category-chip.selected { border-color: #55d8ed; background: #12303b; color: #55d8ed; }
+.theme-gadgets .category-icon { background: #12303b; }
+.theme-gadgets .category-menu { border-color: #245064; background: #0d202a; }
+.theme-gadgets .category-menu button { border-color: #183441; background: #0d202a; color: #e7f7fa; }
+.theme-gadgets .shop-card { border-color: #183441; background: #0d202a; }
+.theme-gadgets .shop-title-row h3, .theme-gadgets .shop-meta, .theme-gadgets .empty-state h3 { color: #e7f7fa; }
+.theme-gadgets .shop-description, .theme-gadgets .empty-state p { color: #9cb8c0; }
+.theme-gadgets .shop-meta { border-color: #183441; color: #9cb8c0; }
+.theme-gadgets .live-tag { border-color: #245064; color: #a9cbd3; }
+.theme-gadgets .community-section { background: #0d202a; }
+.theme-gadgets .community-copy h2, .theme-gadgets .chart-heading h3 { color: #e7f7fa; }
+.theme-gadgets .community-description, .theme-gadgets .community-proof small { color: #9cb8c0; }
+.theme-gadgets .chart-card { border-color: #183441; background: #07141c; }
+.theme-gadgets .chart-name { color: #caeaf0; }
+.theme-gadgets .delivery-art { background: #0d202a; }
+.theme-gadgets .delivery-copy h2 { color: #e7f7fa; }
+.theme-gadgets .delivery-copy > p:not(.section-kicker), .theme-gadgets .delivery-options small { color: #9cb8c0; }
+.theme-gadgets .seller-banner { background: #040c11; }
+.theme-gadgets .site-footer { color: #8aabb6; }
+.theme-accessories { --theme-page: #faf6ff; --theme-ink: #30243d; --orange: #9565d6; --line: #e9ddf3; }
+.theme-accessories .site-header, .theme-accessories .category-experience, .theme-accessories .legacy-category-section, .theme-accessories .shops-section { background: #faf6ff; }
+.theme-accessories .brand-mark { background: #9565d6; }
+.theme-accessories .location-pin, .theme-accessories .section-kicker, .theme-accessories .eyebrow-dot { color: #9565d6; }
+.theme-accessories .category-experience-heading h1 span { color: #9565d6; }
+.theme-accessories .category-door:not(.door-accessories) { border-color: #e9ddf3; background: #fff; }
+.theme-accessories .category-section { border-color: #e9ddf3; }
+.theme-accessories .menu-toggle, .theme-accessories .category-chip { border-color: #e9ddf3; background: #fff; color: #5b4a6c; }
+.theme-accessories .category-chip.selected { border-color: #cbb2e9; background: #f1e8fb; color: #8055bd; }
+.theme-accessories .category-icon { background: #f4edfa; }
+.theme-accessories .category-menu { border-color: #e9ddf3; background: #fff; }
+.theme-accessories .category-menu button { border-color: #eee6f4; background: #fff; color: #5b4a6c; }
+.theme-accessories .shop-card { border-color: #e9ddf3; }
+.theme-accessories .community-section { background: #f1eaf7; }
+.theme-accessories .delivery-art { background: #f1eaf7; }
+.theme-accessories .seller-banner { background: #352547; }
+.theme-accessories .chart-track span, .theme-accessories .chart-row:first-child .chart-track span { background: #9565d6; }
