@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 const categories = [
   { name: "All shops", icon: "✳", slug: "all" },
   { name: "Food & drinks", icon: "🥘", slug: "food" },
-  { name: "Fashion", icon: "👕", slug: "fashion" },
+  { name: "Clothing", icon: "👕", slug: "fashion" },
   { name: "Accessories", icon: "💍", slug: "accessories" },
   { name: "Gadgets", icon: "🎧", slug: "gadgets" },
   { name: "Beauty", icon: "🧴", slug: "beauty" },
@@ -280,85 +280,36 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="hero">
-        <div className="hero-copy">
+      <section className="category-experience" aria-label="Choose what to shop">
+        <div className="category-experience-heading">
           <div className="eyebrow"><span className="eyebrow-dot" /> YOUR CAMPUS, ALL IN ONE PLACE</div>
-          <h1>Good finds.<br /><span>Close by.</span></h1>
-          <p className="hero-subtitle">
-            Your favourite campus spots, all together.<br className="desktop-break" />
-            Find your thing. Get it to your door.
-          </p>
-          <form className="search-bar" onSubmit={(event) => {
-            event.preventDefault();
-            document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" });
-          }}>
-            <span className="search-icon" aria-hidden="true">⌕</span>
-            <input
-              aria-label="Search shops, food, fashion and more"
-              placeholder="Craving something?"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-            {search && <button className="clear-search" type="button" onClick={() => setSearch("")} aria-label="Clear search">×</button>}
-            <button className="search-submit" type="submit">Find it <ArrowIcon /></button>
-          </form>
-          <div className="search-hints">
-            <span>Try:</span>
-            {["jollof", "outfits", "headphones"].map((item) => (
-              <button key={item} onClick={() => setSearch(item)}>{item}</button>
-            ))}
-          </div>
+          <h1>What are you <span>shopping for?</span></h1>
+          <p>Pick a lane. Find your people. Get the good stuff close by.</p>
         </div>
-        <div className="hero-visual">
-          <img
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1100&q=85"
-            alt="A colourful market display of fresh food"
-          />
-          <div className="hero-image-wash" />
-          <div className="floating-note">
-            <span className="note-icon">✳</span>
-            <span><strong>Made for campus life</strong><small>All the good stuff, in one spot.</small></span>
-          </div>
-          <div className="delivery-stamp"><span>LOCAL<br />LOVE</span><i>✳</i></div>
+        <div className="category-doors">
+          <button className="category-door door-food" onClick={() => chooseCategory("food")}><span className="door-index">01 / FRESH & LOCAL</span><span className="door-icon">🥘</span><strong>Food & drinks</strong><span className="door-description">Comfort food, cold drinks, little treats.</span><span className="door-link">Explore food <ArrowIcon /></span></button>
+          <button className="category-door door-fashion" onClick={() => chooseCategory("fashion")}><span className="door-index">02 / YOUR NEXT LOOK</span><span className="door-icon">✦</span><strong>Clothing</strong><span className="door-description">Fits with a little more main character.</span><span className="door-link">Find your fit <ArrowIcon /></span></button>
+          <button className="category-door door-gadgets" onClick={() => chooseCategory("gadgets")}><span className="door-index">03 / GEAR UP</span><span className="door-icon">⌘</span><strong>Gadgets</strong><span className="door-description">Smart tech for campus and everywhere.</span><span className="door-link">Explore tech <ArrowIcon /></span></button>
+          <button className="category-door door-accessories" onClick={() => chooseCategory("accessories")}><span className="door-index">04 / THE FINAL TOUCH</span><span className="door-icon">✧</span><strong>Accessories</strong><span className="door-description">Small details. Unmistakable energy.</span><span className="door-link">Find your extra <ArrowIcon /></span></button>
         </div>
-        <div className="hero-bottom">
-          <span>Good things are happening around you.</span>
-          <a href="#shops">EXPLORE THE MART <ArrowIcon /></a>
-        </div>
+        <form className="search-bar category-search" onSubmit={(event) => { event.preventDefault(); document.getElementById("shops")?.scrollIntoView({ behavior: "smooth" }); }}>
+          <span className="search-icon" aria-hidden="true">⌕</span>
+          <input aria-label="Search shops, food, fashion and more" placeholder="Search anything around campus…" value={search} onChange={(event) => setSearch(event.target.value)} />
+          {search && <button className="clear-search" type="button" onClick={() => setSearch("")} aria-label="Clear search">×</button>}
+          <button className="search-submit" type="submit">Search <ArrowIcon /></button>
+        </form>
+        <div className="category-experience-footer"><span>Local finds for every side of campus life.</span><a href="#shops">BROWSE ALL SHOPS <ArrowIcon /></a></div>
       </section>
 
-      <section className="category-section" aria-label="Shop by category">
-        <div className="section-heading category-heading">
-          <div><p className="section-kicker">A LITTLE BIT OF EVERYTHING</p><h2>What are you in the mood for?</h2></div>
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}>
-            <span className="menu-lines"><i /><i /></span>
-            Browse categories
-          </button>
+      <section className="category-section legacy-category-section" aria-label="More shop categories">
+        <div className="section-heading category-heading"><div><p className="section-kicker">MORE AROUND YOU</p><h2>Explore every corner of the mart</h2></div>
+          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}><span className="menu-lines"><i /><i /></span>Browse categories</button>
         </div>
         <div className="category-list">
-          {categories.map((category) => (
-            <button
-              className={`category-chip ${activeCategory === category.slug ? "selected" : ""}`}
-              key={category.slug}
-              onClick={() => chooseCategory(category.slug)}
-              aria-pressed={activeCategory === category.slug}
-            >
-              <span className="category-icon">{category.icon}</span>
-              <span>{category.name}</span>
-              <ArrowIcon />
-            </button>
-          ))}
+          {categories.filter((category) => !["food", "fashion", "gadgets", "accessories"].includes(category.slug)).map((category) => <button className={`category-chip ${activeCategory === category.slug ? "selected" : ""}`} key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}><span className="category-icon">{category.icon}</span><span>{category.name}</span><ArrowIcon /></button>)}
+          <button className={`category-chip ${activeCategory === "all" ? "selected" : ""}`} onClick={() => chooseCategory("all")} aria-pressed={activeCategory === "all"}><span className="category-icon">✳</span><span>All shops</span><ArrowIcon /></button>
         </div>
-        {menuOpen && (
-          <div className="category-menu">
-            <p>SHOP BY CATEGORY</p>
-            {categories.map((category) => (
-              <button key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}>
-                <span>{category.icon}</span>{category.name}<ArrowIcon />
-              </button>
-            ))}
-          </div>
-        )}
+        {menuOpen && <div className="category-menu"><p>SHOP BY CATEGORY</p>{categories.map((category) => <button key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}><span>{category.icon}</span>{category.name}<ArrowIcon /></button>)}</div>}
       </section>
 
       <section className="shops-section" id="shops">
