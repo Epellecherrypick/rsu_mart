@@ -18,7 +18,7 @@ const fontOptions = {
 };
 const emptyShop = {
   name: "",
-  category: serviceTypes[0],
+  category: "",
   description: "",
   bannerImage: "",
   theme: {
@@ -135,8 +135,9 @@ export default function SellerShopForm() {
               <input value={shop.name} onChange={(event) => updateField("name", event.target.value)} required minLength={2} maxLength={80} placeholder="e.g. The Daily Drip" />
             </label>
             <label className="shop-field">
-              <span>What service do you provide?</span>
-              <select value={shop.category} onChange={(event) => updateField("category", event.target.value)}>
+              <span>What category does your shop belong to?</span>
+              <select value={shop.category} onChange={(event) => updateField("category", event.target.value)} required>
+                <option value="" disabled>Select a category</option>
                 {serviceTypes.map((service) => <option key={service}>{service}</option>)}
               </select>
             </label>

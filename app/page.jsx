@@ -175,6 +175,7 @@ export default function Home() {
   const [shopsLoading, setShopsLoading] = useState(true);
   const [viewer, setViewer] = useState(null);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [activeTheme, setActiveTheme] = useState("food");
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [preferredCategories, setPreferredCategories] = useState([]);
@@ -222,7 +223,10 @@ export default function Home() {
       .catch(() => {});
     const params = new URLSearchParams(window.location.search);
     const category = params.get("category");
-    if (category && (category === "all" || categories.some((item) => item.slug === category))) setActiveCategory(category);
+    if (category && (category === "all" || categories.some((item) => item.slug === category))) {
+      setActiveCategory(category);
+      if (["food", "fashion", "gadgets", "accessories"].includes(category)) setActiveTheme(category);
+    }
     return () => { active = false; };
   }, []);
 
@@ -250,6 +254,7 @@ export default function Home() {
 
   function chooseCategory(slug) {
     setActiveCategory(slug);
+    if (["food", "fashion", "gadgets", "accessories"].includes(slug)) setActiveTheme(slug);
     setMenuOpen(false);
     const params = new URLSearchParams(window.location.search);
     if (slug === "all") params.delete("category"); else params.set("category", slug);
@@ -258,7 +263,7 @@ export default function Home() {
   }
 
   return (
-    <main className={`mart-theme ${activeCategory !== "all" ? `theme-${activeCategory}` : ""}`}>
+    <main className={`mart-theme theme-${activeTheme}`}>
       <header className="site-header">
         <div className="header-inner">
           <a className="brand" href="#" aria-label="RSU Mart home">
