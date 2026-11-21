@@ -55,6 +55,7 @@ export default function ProfilePage() {
     <div className="profile-wrap">
       <p className="section-kicker">YOUR RSU MART ACCOUNT</p>
       <h1>Your profile</h1>
+      <p><a href="/tokens">Open token wallet →</a></p>
       <p className="profile-intro">Set up your details and tell us what you like. We’ll use your picks to make shop discovery feel more relevant.</p>
       {busy && !user ? <p role="status">Loading your profile…</p> : !user ? <p className="profile-message" role="alert">Sign in to view and update your profile.</p> : <form className="profile-card" onSubmit={save}>
         <label className="profile-field"><span>Your name</span><input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} maxLength={80} /></label>

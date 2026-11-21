@@ -88,8 +88,8 @@ export default function LoginForm({ nextPath }) {
             <p>{mode === "login" ? "Sign in to pick up where you left off." : "Create one account for all your campus finds."}</p>
           </div>
           <div className="auth-tabs" role="tablist" aria-label="Account options">
-            <button type="button" role="tab" aria-selected={mode === "login"} className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setError(""); }}>Sign in</button>
-            <button type="button" role="tab" aria-selected={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }}>Create account</button>
+            <button type="button" role="tab" aria-selected={mode === "login"} className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setError(""); }} disabled={busy}>Sign in</button>
+            <button type="button" role="tab" aria-selected={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setError(""); }} disabled={busy}>Create account</button>
           </div>
           <form className="auth-form" onSubmit={submit}>
             {mode === "register" && (

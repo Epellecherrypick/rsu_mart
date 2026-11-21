@@ -21,15 +21,52 @@ function ProductCard({ product, fontFamily }) {
   );
   const [selectedIndex, setSelectedIndex] = useState(defaultIndex);
   const [colorsOpen, setColorsOpen] = useState(false);
+  const [buyMessage, setBuyMessage] = useState("");
+  const [buying, setBuying] = useState(false);
   const selected = product.variants[selectedIndex] || product.variants[0];
   const totalStock = product.variants.reduce((total, variant) => total + variant.inventory, 0);
+  const discountActive = Number(product.discountPercent || 0) > 0
+    && (!product.discountEndsAt || new Date(product.discountEndsAt).getTime() > Date.now())
+    && (product.discountType !== "individual");
+  const discountedPrice = discountActive
+    ? product.priceKobo * (100 - Number(product.discountPercent)) / 100
+    : product.priceKobo;
+
+  async function buy() {
+    if (buying || totalStock < 1) return;
+    setBuying(true);
+    setBuyMessage("");
+    try {
+      const response = await fetch("/api/tokens/purchase", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, variantId: selected?.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) setBuyMessage(result.error || "Purchase could not be completed.");
+      else setBuyMessage(`Purchase complete: ${result.purchase.reference}. Tokens will be reconciled.`);
+    } catch {
+      setBuyMessage("We couldn’t reach RSU Mart. Please try again.");
+    } finally {
+      setBuying(false);
+    }
+  }
 
   return (
     <article className="public-product-card" style={{ fontFamily }}>
       {selected && <img className="public-product-image" src={selected.imageUrl} alt={`${product.name} in ${selected.color}`} />}
       <div className="public-product-copy">
         <h2>{product.name}</h2>
-        <strong>{money(product.priceKobo)}</strong>
+        {discountActive ? (
+          <div className="discounted-price">
+            <s>{money(product.priceKobo)}</s>
+            <strong>{money(Math.round(discountedPrice))}</strong>
+            <small>{product.discountPercent}% off · Ends {new Date(product.discountEndsAt).toLocaleString()}</small>
+          </div>
+        ) : <strong>{money(product.priceKobo)}</strong>}
+        <button className="public-buy-button" type="button" onClick={buy} disabled={totalStock < 1 || buying} aria-busy={buying}>{buying ? "Completing purchase…" : "Buy with tokens"}</button>
+        {buyMessage && <small className="public-buy-message">{buyMessage}</small>}
         <p>{product.description}</p>
         <span className="public-product-stock">{totalStock > 0 ? `${totalStock} available` : "Out of stock"}</span>
         {product.variants.length > 1 && (

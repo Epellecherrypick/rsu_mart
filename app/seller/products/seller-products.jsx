@@ -27,6 +27,10 @@ function productToForm(product) {
       0,
       product.variants.findIndex((variant) => variant.id === product.defaultVariantId),
     ),
+    discountPercent: String(product.discountPercent || 0),
+    discountType: product.discountType || "universal",
+    discountUserId: product.discountUserId || "",
+    discountEndsAt: product.discountEndsAt ? new Date(product.discountEndsAt).toISOString().slice(0,16) : "",
   };
 }
 
@@ -34,6 +38,7 @@ export default function SellerProducts({ shopId, shopName }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [removingId, setRemovingId] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -43,6 +48,10 @@ export default function SellerProducts({ shopId, shopName }) {
     price: "",
     variants: [blankVariant()],
     defaultVariantIndex: 0,
+    discountPercent: "0",
+    discountType: "universal",
+    discountUserId: "",
+    discountEndsAt: "",
   });
 
   async function loadProducts() {
@@ -74,6 +83,10 @@ export default function SellerProducts({ shopId, shopName }) {
       price: "",
       variants: [blankVariant()],
       defaultVariantIndex: 0,
+      discountPercent: "0",
+      discountType: "universal",
+      discountUserId: "",
+      discountEndsAt: "",
     });
   }
 
@@ -125,6 +138,10 @@ export default function SellerProducts({ shopId, shopName }) {
           inventory: Number(variant.inventory),
         })),
         defaultVariantIndex: form.defaultVariantIndex,
+        discountPercent: Number(form.discountPercent),
+        discountType: form.discountType,
+        discountUserId: form.discountType === "individual" ? form.discountUserId : null,
+        discountEndsAt: form.discountEndsAt ? new Date(form.discountEndsAt).toISOString() : null,
       };
       const response = await fetch(
         editingId ? `/api/seller/products/${encodeURIComponent(editingId)}` : "/api/seller/products",
@@ -152,7 +169,9 @@ export default function SellerProducts({ shopId, shopName }) {
   }
 
   async function removeProduct(product) {
+    if (busy || removingId) return;
     if (!window.confirm(`Remove "${product.name}" from your shop?`)) return;
+    setRemovingId(product.id);
     setError("");
     setNotice("");
     try {
@@ -167,6 +186,8 @@ export default function SellerProducts({ shopId, shopName }) {
       setNotice("Product removed.");
     } catch (removeError) {
       setError(removeError.message);
+    } finally {
+      setRemovingId("");
     }
   }
 
@@ -207,8 +228,8 @@ export default function SellerProducts({ shopId, shopName }) {
                         <p>₦{(product.priceKobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 2 })}</p>
                         <small>{product.variants.length} color{product.variants.length === 1 ? "" : "s"} · {totalInventory} in stock</small>
                         <div>
-                          <button type="button" onClick={() => startEditing(product)}>Edit</button>
-                          <button type="button" onClick={() => removeProduct(product)}>Remove</button>
+                          <button type="button" onClick={() => startEditing(product)} disabled={busy || !!removingId}>Edit</button>
+                          <button type="button" onClick={() => removeProduct(product)} disabled={busy || !!removingId}>{removingId === product.id ? "Removing…" : "Remove"}</button>
                         </div>
                       </div>
                     </article>
@@ -235,6 +256,20 @@ export default function SellerProducts({ shopId, shopName }) {
               <span>Price (NGN)</span>
               <input type="number" value={form.price} onChange={(event) => setForm((current) => ({ ...current, price: event.target.value }))} required min="0.01" max="1000000" step="0.01" placeholder="0.00" />
             </label>
+            {Number(form.price) > 0 && (
+              <div className="selling-price-notice" role="note">
+                <strong>Selling for: ₦{(Number(form.price) * 0.95).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong>
+                <span>RSU Mart takes 5% (₦{(Number(form.price) * 0.05).toLocaleString("en-NG", { maximumFractionDigits: 2 })}) from each buyer purchase.</span>
+              </div>
+            )}
+            <fieldset className="discount-editor">
+              <legend>Discount</legend>
+              <p>Set a timed universal discount or a discount for one customer.</p>
+              <label className="shop-field"><span>Discount type</span><select value={form.discountType} onChange={(event) => setForm((current) => ({ ...current, discountType: event.target.value }))}><option value="universal">Universal — every buyer</option><option value="individual">Individual — one account ID</option></select></label>
+              {form.discountType === "individual" && <label className="shop-field"><span>Buyer account ID</span><input value={form.discountUserId} onChange={(event) => setForm((current) => ({ ...current, discountUserId: event.target.value }))} maxLength={100} placeholder="Customer account ID" /></label>}
+              <label className="shop-field"><span>Discount percent</span><input type="number" min="0" max="90" value={form.discountPercent} onChange={(event) => setForm((current) => ({ ...current, discountPercent: event.target.value }))} /></label>
+              <label className="shop-field"><span>Discount ends</span><input type="datetime-local" value={form.discountEndsAt} onChange={(event) => setForm((current) => ({ ...current, discountEndsAt: event.target.value }))} /></label>
+            </fieldset>
 
             <fieldset className="product-variants-fieldset">
               <legend>Colors and inventory</legend>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const categories = [
   { name: "All shops", icon: "✳", slug: "all" },
@@ -178,6 +178,9 @@ export default function Home() {
   const [activeTheme, setActiveTheme] = useState("food");
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const menuCloseTimer = useRef(null);
   const [preferredCategories, setPreferredCategories] = useState([]);
   const [hasShop, setHasShop] = useState(false);
 
@@ -255,11 +258,31 @@ export default function Home() {
   function chooseCategory(slug) {
     setActiveCategory(slug);
     if (["food", "fashion", "gadgets", "accessories"].includes(slug)) setActiveTheme(slug);
-    setMenuOpen(false);
+    closeCategoryMenu();
     const params = new URLSearchParams(window.location.search);
     if (slug === "all") params.delete("category"); else params.set("category", slug);
     const query = params.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+  }
+
+  function closeCategoryMenu() {
+    if (!menuOpen) return;
+    setMenuClosing(true);
+    clearTimeout(menuCloseTimer.current);
+    menuCloseTimer.current = setTimeout(() => {
+      setMenuOpen(false);
+      setMenuClosing(false);
+    }, 240);
+  }
+
+  function toggleCategoryMenu() {
+    if (menuOpen && !menuClosing) {
+      closeCategoryMenu();
+      return;
+    }
+    clearTimeout(menuCloseTimer.current);
+    setMenuClosing(false);
+    setMenuOpen(true);
   }
 
   return (
@@ -275,13 +298,16 @@ export default function Home() {
             <span><small>DELIVERING AROUND</small><strong>{viewer?.preferences?.campusLocation || "RSU campus"}</strong></span>
             <span className="location-chevron" aria-hidden="true">⌄</span>
           </div>
-          <div className="header-actions">
+          <button className="header-menu-toggle" type="button" aria-expanded={headerMenuOpen} aria-controls="home-navigation" onClick={() => setHeaderMenuOpen((open) => !open)}>
+            <span className="menu-lines" aria-hidden="true"><i /><i /><i /></span><span>Menu</span>
+          </button>
+          <nav className={`header-actions ${headerMenuOpen ? "is-open" : ""}`} id="home-navigation" aria-label="Account and seller navigation">
             {viewer?.isAdmin && <a className="seller-link" href="/admin/transfers">Admin <ArrowIcon diagonal /></a>}
             <a className="seller-link" href={hasShop ? "/seller/products" : "/seller"}>
               {hasShop ? "My shop" : "Open a shop"} <ArrowIcon diagonal />
             </a>
             <a className="account-link" href={viewer ? "/profile" : "/login"}>{viewer ? viewer.name.split(" ")[0] : "Sign in"}</a>
-          </div>
+          </nav>
         </div>
       </header>
 
@@ -308,13 +334,13 @@ export default function Home() {
 
       <section className="category-section legacy-category-section" aria-label="More shop categories">
         <div className="section-heading category-heading"><div><p className="section-kicker">MORE AROUND YOU</p><h2>Explore every corner of the mart</h2></div>
-          <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen}><span className="menu-lines"><i /><i /></span>Browse categories</button>
+          <button className="menu-toggle" onClick={toggleCategoryMenu} aria-expanded={menuOpen && !menuClosing}><span className="menu-lines"><i /><i /></span>{menuOpen && !menuClosing ? "Close categories" : "Browse categories"}</button>
         </div>
         <div className="category-list">
           {categories.filter((category) => !["food", "fashion", "gadgets", "accessories"].includes(category.slug)).map((category) => <button className={`category-chip ${activeCategory === category.slug ? "selected" : ""}`} key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}><span className="category-icon">{category.icon}</span><span>{category.name}</span><ArrowIcon /></button>)}
           <button className={`category-chip ${activeCategory === "all" ? "selected" : ""}`} onClick={() => chooseCategory("all")} aria-pressed={activeCategory === "all"}><span className="category-icon">✳</span><span>All shops</span><ArrowIcon /></button>
         </div>
-        {menuOpen && <div className="category-menu"><p>SHOP BY CATEGORY</p>{categories.map((category) => <button key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}><span>{category.icon}</span>{category.name}<ArrowIcon /></button>)}</div>}
+        {menuOpen && <div className={`category-menu ${menuClosing ? "is-closing" : ""}`}><p>SHOP BY CATEGORY</p>{categories.map((category) => <button key={category.slug} onClick={() => chooseCategory(category.slug)} aria-pressed={activeCategory === category.slug}><span>{category.icon}</span>{category.name}<ArrowIcon /></button>)}</div>}
       </section>
 
       <section className="shops-section" id="shops">

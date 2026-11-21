@@ -18,6 +18,7 @@ export default function SellerDashboard({ user }) {
   const [error, setError] = useState("");
   const [senderAccountName, setSenderAccountName] = useState("");
   const [senderAccountNumber, setSenderAccountNumber] = useState("");
+  const [navOpen, setNavOpen] = useState(false);
   const isPaid = user.sellerStatus === "paid";
   const isTestSeller = user.sellerTestMode === true;
   const canUseFreeDevActivation = process.env.NODE_ENV === "development";
@@ -100,7 +101,13 @@ export default function SellerDashboard({ user }) {
     <main className="seller-page">
       <header className="seller-topbar">
         <Brand />
-        <div>{user.isAdmin && <a href="/admin/transfers">Admin transfers</a>}<a href="/">← Back to the mart</a><button onClick={signOut}>Sign out</button></div>
+        <button className="seller-nav-toggle" type="button" aria-expanded={navOpen} aria-controls="seller-navigation" onClick={() => setNavOpen((open) => !open)}>
+          <span className="menu-lines" aria-hidden="true"><i /><i /><i /></span><span>Menu</span>
+        </button>
+        <nav className={`seller-nav ${navOpen ? "is-open" : ""}`} id="seller-navigation" aria-label="Seller navigation">
+          {user.isAdmin && <><a href="/admin/transfers">Seller transfers</a><a href="/admin/tokens">Token approvals</a><a href="/admin/withdrawals">Withdrawals</a><a href="/admin/security">Security</a></>}
+          <a href="/seller/withdraw">Withdraw tokens</a><a href="/">← Back to the mart</a><button onClick={signOut} disabled={busy}>Sign out</button>
+        </nav>
       </header>
       <section className="seller-dashboard">
         <div className="seller-welcome">

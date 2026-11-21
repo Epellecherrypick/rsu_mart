@@ -13,7 +13,8 @@ import {
   isDevelopmentAuthEnabled,
 } from "../../../../lib/dev-auth";
 import { getDatabase } from "../../../../lib/mongodb";
-import { checkRateLimit, rateLimitedResponse } from "../../../../lib/rate-limit";
+import { inspectRequest } from "../../../../lib/security";
+import { clientIp } from "../../../../lib/tokens";
 
 const loginSchema = z.object({
   email: z.string().trim().email().max(254),
@@ -41,9 +42,8 @@ export async function POST(request) {
   }
 
   const email = parsed.data.email.toLowerCase();
-  if (!(await checkRateLimit("login", email, 10, 15 * 60 * 1000))) {
-    return rateLimitedResponse();
-  }
+  const blocked = await inspectRequest(request, "login", `${clientIp(request)}:${email}`, 10, 15 * 60 * 1000);
+  if (blocked) return blocked;
 
   let user;
   if (isDevelopmentAuthEnabled()) {
