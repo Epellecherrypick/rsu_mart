@@ -10,6 +10,6 @@ export default async function AdminSetupPage() {
   const user = await getUserForSession(cookieStore.get(SESSION_COOKIE)?.value);
   if (!user) redirect("/login?next=%2Fadmin%2Fsetup");
   if (!isAllowlistedAdminEmail(user.email)) redirect("/");
-  if (isAdminUser(user)) redirect("/admin/transfers");
+  if (isAdminUser(user)) redirect("/admin");
   return <AdminSetupForm />;
 }
