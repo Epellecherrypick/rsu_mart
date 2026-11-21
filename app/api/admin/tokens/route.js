@@ -17,11 +17,20 @@ export async function GET(request) {
   if (response) return response;
   if (isDevelopmentAuthEnabled()) {
     const records = [...globalThis.__rsuMartDevelopmentAuth.tokenRequestsByReference.values()].sort((a,b) => b.createdAt-a.createdAt);
-    return Response.json({ requests: records.map((item) => ({ reference:item.reference, tokens:item.tokens, paymentReference:item.paymentReference, status:item.status, createdAt:item.createdAt, approvedAt:item.approvedAt || null })) });
+    return Response.json({ requests: records.map((item) => {
+      const customer = globalThis.__rsuMartDevelopmentAuth.usersById.get(item.userId);
+      return { reference:item.reference, tokens:item.tokens, paymentReference:item.paymentReference, status:item.status, createdAt:item.createdAt, approvedAt:item.approvedAt || null, customer: customer ? { name: customer.name, email: customer.email } : null };
+    }) });
   }
   const database = await getDatabase();
   const records = await database.collection("token_requests").find().sort({createdAt:-1}).limit(200).toArray();
-  return Response.json({ requests: records.map((item) => ({ reference:item.reference, tokens:item.tokens, paymentReference:item.paymentReference, status:item.status, createdAt:item.createdAt, approvedAt:item.approvedAt || null })) });
+  const userIds = [...new Map(records.filter((item) => item.userId).map((item) => [item.userId.toString(), item.userId])).values()];
+  const customers = await database.collection("users").find({ _id: { $in: userIds } }, { projection: { name: 1, email: 1 } }).toArray();
+  const customersById = new Map(customers.map((item) => [item._id.toString(), item]));
+  return Response.json({ requests: records.map((item) => {
+    const customer = customersById.get(item.userId?.toString());
+    return { reference:item.reference, tokens:item.tokens, paymentReference:item.paymentReference, status:item.status, createdAt:item.createdAt, approvedAt:item.approvedAt || null, customer: customer ? { name: customer.name, email: customer.email } : null };
+  }) });
 }
 
 const schema = z.object({ reference: z.string().startsWith("TOK-"), action: z.enum(["approve","reject"]), reason:z.string().max(300).optional() });

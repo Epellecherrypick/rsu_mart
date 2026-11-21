@@ -18,6 +18,7 @@ export default async function AdminPage() {
     pendingWithdrawals: 0,
     pendingSellerTransfers: 0,
     securityEvents: 0,
+    flaggedAccounts: 0,
   };
 
   if (isDevelopmentAuthEnabled()) {
@@ -26,12 +27,14 @@ export default async function AdminPage() {
     summary.pendingWithdrawals = [...(state?.withdrawalsByReference?.values() || [])].filter((item) => item.status === "pending").length;
     summary.pendingSellerTransfers = [...(state?.paymentsByReference?.values() || [])].filter((item) => item.status === "pending").length;
     summary.securityEvents = state?.securityEvents?.length || 0;
+    summary.flaggedAccounts = [...(state?.usersById?.values() || [])].filter((item) => item.accountFlag).length;
   } else {
     const database = await getDatabase();
     summary.pendingTokenRequests = await database.collection("token_requests").countDocuments({ status: "pending" });
     summary.pendingWithdrawals = await database.collection("withdrawals").countDocuments({ status: "pending" });
     summary.pendingSellerTransfers = await database.collection("payments").countDocuments({ purpose: "seller_onboarding", status: "pending" });
     summary.securityEvents = await database.collection("security_events").countDocuments({});
+    summary.flaggedAccounts = await database.collection("users").countDocuments({ accountFlag: { $exists: true } });
   }
 
   return <AdminDashboard summary={summary} />;

@@ -1,34 +1,10 @@
 "use client";
 
-import { useState } from "react";
-
 export default function AdminDashboard({ summary }) {
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState("");
-
-  async function reconcile() {
-    setBusy(true);
-    setMessage("");
-    try {
-      const response = await fetch("/api/tokens/reconcile", {
-        method: "POST",
-        credentials: "same-origin",
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Could not run reconciliation.");
-      setMessage(`Reconciliation complete: ${result.reconciled} reconciled, ${result.flagged} flagged.`);
-    } catch (error) {
-      setMessage(error.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-
   const cards = [
-    { href: "/admin/tokens", title: "Token purchases", count: summary.pendingTokenRequests, copy: "Approve or reject real-money token purchases.", action: "Review tokens" },
-    { href: "/admin/withdrawals", title: "Seller withdrawals", count: summary.pendingWithdrawals, copy: "Send cash and mark seller withdrawals paid.", action: "Review withdrawals" },
-    { href: "/admin/transfers", title: "Seller onboarding", count: summary.pendingSellerTransfers, copy: "Approve or reject seller onboarding transfers.", action: "Review seller transfers" },
-    { href: "/admin/security", title: "Security events", count: summary.securityEvents, copy: "Review crawling, rate limits, flags, and reconciliation events.", action: "Open security log" },
+    { href: "/admin/sellers", title: "Seller account purchases", count: summary.pendingSellerTransfers, copy: "Approve seller onboarding purchases and activate approved accounts.", action: "Open seller approvals" },
+    { href: "/admin/finance", title: "Token purchases & withdrawals", count: summary.pendingTokenRequests + summary.pendingWithdrawals, copy: "Approve purchased tokens and process seller cash withdrawals.", action: "Open token finance" },
+    { href: "/admin/reports", title: "Reports & monitoring", count: summary.flaggedAccounts + summary.securityEvents, copy: "Review reports, logged events, flagged accounts, crawlers, and rate limits.", action: "Open reports" },
   ];
 
   return (
@@ -42,16 +18,10 @@ export default function AdminDashboard({ summary }) {
       </div>
       <div className="admin-transfer-wrap">
         <p className="section-kicker">RSU MART · ADMIN CONTROL PANEL</p>
-        <h1>Approvals and monitoring</h1>
+        <h1>Three admin dashboards</h1>
         <p className="admin-transfer-intro">
           Review pending account activity and confirm real-money transfers before any token or seller state changes.
         </p>
-        <div className="admin-transfer-toolbar">
-          <button type="button" onClick={reconcile} disabled={busy}>
-            {busy ? "Checking purchases…" : "Run 30-minute purchase reconciliation"}
-          </button>
-        </div>
-        {message && <p className="admin-transfer-notice" role="status">{message}</p>}
         <div className="admin-transfer-list">
           {cards.map((card) => (
             <article className="admin-transfer-item" key={card.href}>

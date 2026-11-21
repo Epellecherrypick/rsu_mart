@@ -105,7 +105,7 @@ export default function SellerDashboard({ user }) {
           <span className="menu-lines" aria-hidden="true"><i /><i /><i /></span><span>Menu</span>
         </button>
         <nav className={`seller-nav ${navOpen ? "is-open" : ""}`} id="seller-navigation" aria-label="Seller navigation">
-          {user.isAdmin && <><a href="/admin/transfers">Seller transfers</a><a href="/admin/tokens">Token approvals</a><a href="/admin/withdrawals">Withdrawals</a><a href="/admin/security">Security</a></>}
+          {user.isAdmin && <a href="/admin">Admin dashboards</a>}
           <a href="/seller/withdraw">Withdraw tokens</a><a href="/">← Back to the mart</a><button onClick={signOut} disabled={busy}>Sign out</button>
         </nav>
       </header>
