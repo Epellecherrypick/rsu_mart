@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import AdminNav from "../admin-nav";
 
 function Brand() {
   return <a className="brand auth-brand" href="/" aria-label="RSU Mart home"><span className="brand-mark">r<span>.</span></span><span>rsu<span className="brand-light">mart</span></span></a>;
@@ -55,6 +56,7 @@ export default function AdminTransferQueue() {
 
   return <main className="auth-page">
     <div className="auth-topbar"><Brand /><a href="/">Back to the mart <span>↗</span></a></div>
+    <AdminNav active="/admin/sellers" />
     <div className="admin-transfer-wrap">
       <p className="section-kicker">RSU MART · ADMIN</p>
       <h1>Seller transfer approvals</h1>

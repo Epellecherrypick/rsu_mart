@@ -1,9 +1,11 @@
 "use client";
 
+import AdminNav from "./admin-nav";
+
 export default function AdminDashboard({ summary }) {
   const cards = [
     { href: "/admin/sellers", title: "Seller account purchases", count: summary.pendingSellerTransfers, copy: "Approve seller onboarding purchases and activate approved accounts.", action: "Open seller approvals" },
-    { href: "/admin/finance", title: "Token purchases & withdrawals", count: summary.pendingTokenRequests + summary.pendingWithdrawals, copy: "Approve purchased tokens and process seller cash withdrawals.", action: "Open token finance" },
+    { href: "/admin/finance", title: "Token purchase requests & withdrawals", count: summary.pendingTokenRequests + summary.pendingWithdrawals, copy: `${summary.pendingTokenRequests} token requests · ${summary.pendingWithdrawals} withdrawals awaiting review.`, action: "Open token requests" },
     { href: "/admin/reports", title: "Reports & monitoring", count: summary.flaggedAccounts + summary.securityEvents, copy: "Review reports, logged events, flagged accounts, crawlers, and rate limits.", action: "Open reports" },
   ];
 
@@ -16,6 +18,7 @@ export default function AdminDashboard({ summary }) {
         </a>
         <a href="/">Back to the mart <span aria-hidden="true">↗</span></a>
       </div>
+      <AdminNav active="/admin" />
       <div className="admin-transfer-wrap">
         <p className="section-kicker">RSU MART · ADMIN CONTROL PANEL</p>
         <h1>Three admin dashboards</h1>

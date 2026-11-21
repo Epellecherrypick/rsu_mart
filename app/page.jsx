@@ -302,7 +302,8 @@ export default function Home() {
             <span className="menu-lines" aria-hidden="true"><i /><i /><i /></span><span>Menu</span>
           </button>
           <nav className={`header-actions ${headerMenuOpen ? "is-open" : ""}`} id="home-navigation" aria-label="Account and seller navigation">
-            {viewer?.isAdmin && <a className="seller-link" href="/admin/transfers">Admin <ArrowIcon diagonal /></a>}
+            {viewer?.isAdmin && <a className="seller-link" href="/admin">Admin <ArrowIcon diagonal /></a>}
+            <a className="seller-link" href="/tokens">Request tokens <ArrowIcon diagonal /></a>
             <a className="seller-link" href={hasShop ? "/seller/products" : "/seller"}>
               {hasShop ? "My shop" : "Open a shop"} <ArrowIcon diagonal />
             </a>
